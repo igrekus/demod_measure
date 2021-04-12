@@ -9,12 +9,6 @@ from measureresult import MeasureResult
 
 
 class InstrumentController(QObject):
-    states = {
-        i * 0.25: i for i in range(64)
-    }
-
-    main_states = [0, 1, 2, 4, 8, 16, 32, 63]
-
     def __init__(self, parent=None):
         super().__init__(parent=parent)
 
@@ -39,17 +33,7 @@ class InstrumentController(QObject):
                 raw = ''.join(f.readlines())
                 self.deviceParams = ast.literal_eval(raw)
 
-        self.secondaryParams = {
-            'Pin': -10,
-            'F1': 4,
-            'F2': 8,
-            'kp': 0,
-            'Fborder1': 4,
-            'Fborder2': 8
-        }
-
-        self.sweep_points = 201
-        self.cal_set = '-20db_pyatkin_6G'
+        self.secondaryParams = {}
 
         self._instruments = dict()
         self.found = False
