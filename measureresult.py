@@ -2,17 +2,19 @@ import random
 
 
 class MeasureResult:
-    adjust_dirs = {
-        1: 'data/+25',
-        2: 'data/+85',
-        3: 'data/-60',
-    }
-
-    def __init__(self, ):
-
+    def __init__(self, raw, secondaryParams):
         self.headers = list()
-        self._secondaryParams = dict()
+        self._secondaryParams = secondaryParams
         self.ready = False
+
+        self.raw = raw
+
+        self.data1 = [[random.randint(0, 50) for _ in range(10)]]
+        self.data2 = [[random.randint(0, 50) for _ in range(10)]]
+        self.data3 = [[random.randint(0, 50) for _ in range(10)]]
+        self.data4 = [[random.randint(0, 50) for _ in range(10)]]
+
+        self._process()
 
     def __bool__(self):
         return self.ready
@@ -22,19 +24,3 @@ class MeasureResult:
 
     def _process(self):
         self.ready = True
-
-    @property
-    def raw_data(self):
-        return True
-
-    @raw_data.setter
-    def raw_data(self, args):
-        print('process result')
-        self._init()
-
-        print(args)
-        self._process()
-
-    @property
-    def stats(self):
-        return f'stats'

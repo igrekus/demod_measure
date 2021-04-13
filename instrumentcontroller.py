@@ -41,9 +41,7 @@ class InstrumentController(QObject):
         self.hasResult = False
         self.only_main_states = False
 
-        self.result = MeasureResult()
-
-        self._freqs = list()
+        self.result = None
 
     def __str__(self):
         return f'{self._instruments}'
@@ -77,7 +75,7 @@ class InstrumentController(QObject):
     def measure(self, params):
         print(f'call measure with {params}')
         device, _ = params
-        self.result.raw_data = self._measure(device), self.secondaryParams
+        self.result = MeasureResult(self._measure(device), self.secondaryParams)
         self.hasResult = bool(self.result)
 
     def _measure(self, device):
