@@ -11,10 +11,10 @@ from PyQt6.QtWidgets import QGridLayout, QWidget
 
 class PrimaryPlotWidget(QWidget):
 
-    def __init__(self, parent=None, result=None):
+    def __init__(self, parent=None, controller=None):
         super().__init__(parent)
 
-        self._result = result
+        self._controller = controller   # TODO decouple from controller, use explicit result passing
         self.only_main_states = False
 
         self._grid = QGridLayout()
