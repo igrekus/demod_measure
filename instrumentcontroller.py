@@ -4,7 +4,7 @@ from os.path import isfile
 from PyQt6.QtCore import QObject, pyqtSlot
 
 from instr.instrumentfactory import mock_enabled, OscilloscopeFactory, GeneratorFactory, SourceFactory, \
-    MultimeterFactory, NetworkAnalyzerFactory
+    MultimeterFactory, AnalyzerFactory
 from measureresult import MeasureResult
 
 
@@ -18,7 +18,7 @@ class InstrumentController(QObject):
             'Генератор 2': GeneratorFactory('GPIB1::10::INSTR'),
             'Источник': SourceFactory('GPIB1::10::INSTR'),
             'Мультиметр': MultimeterFactory('GPIB1::10::INSTR'),
-            'Анализатор цепей': NetworkAnalyzerFactory('GPIB1::10::INSTR'),
+            'Анализатор': AnalyzerFactory('GPIB1::18::INSTR'),
         }
 
         self.deviceParams = {
