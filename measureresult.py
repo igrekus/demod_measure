@@ -9,10 +9,10 @@ class MeasureResult:
 
         self.raw = raw
 
-        self.data1 = [[random.randint(0, 50) for _ in range(10)]]
-        self.data2 = [[random.randint(0, 50) for _ in range(10)]]
-        self.data3 = [[random.randint(0, 50) for _ in range(10)]]
-        self.data4 = [[random.randint(0, 50) for _ in range(10)]]
+        self.data1 = [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [random.randint(0, 50) for _ in range(10)]]
+        self.data2 = [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [random.randint(0, 50) for _ in range(10)]]
+        self.data3 = [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [random.randint(0, 50) for _ in range(10)]]
+        self.data4 = [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [random.randint(0, 50) for _ in range(10)]]
 
         self._process()
 
