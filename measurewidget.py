@@ -65,6 +65,9 @@ class MeasureWidget(QWidget):
                                         self.measureTaskComplete,
                                         self._selectedDevice))
 
+    def cancel(self):
+        pass
+
     def measureTaskComplete(self):
         print('measure complete')
         if not self._controller.hasResult:
@@ -89,6 +92,11 @@ class MeasureWidget(QWidget):
         self.measureStarted.emit()
         self.measure()
 
+    @pyqtSlot()
+    def on_btnCancel_clicked(self):
+        print('cancel click')
+        self.cancel()
+
     @pyqtSlot(int)
     def on_selectedChanged(self, value):
         self._selectedDevice = value
@@ -97,26 +105,31 @@ class MeasureWidget(QWidget):
     def _modePreConnect(self):
         self._ui.btnCheck.setEnabled(False)
         self._ui.btnMeasure.setEnabled(False)
+        self._ui.btnCancel.setEnabled(False)
         self._devices.enabled = True
 
     def _modePreCheck(self):
         self._ui.btnCheck.setEnabled(True)
         self._ui.btnMeasure.setEnabled(False)
+        self._ui.btnCancel.setEnabled(False)
         self._devices.enabled = True
 
     def _modeDuringCheck(self):
         self._ui.btnCheck.setEnabled(False)
         self._ui.btnMeasure.setEnabled(False)
+        self._ui.btnCancel.setEnabled(False)
         self._devices.enabled = False
 
     def _modePreMeasure(self):
         self._ui.btnCheck.setEnabled(False)
         self._ui.btnMeasure.setEnabled(True)
+        self._ui.btnCancel.setEnabled(False)
         self._devices.enabled = False
 
     def _modeDuringMeasure(self):
         self._ui.btnCheck.setEnabled(False)
         self._ui.btnMeasure.setEnabled(False)
+        self._ui.btnCancel.setEnabled(True)
         self._devices.enabled = False
 
 
@@ -248,21 +261,6 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._checkOscAvg.toggled.connect(self.on_params_changed)
 
         self._spinLoss.valueChanged.connect(self.on_params_changed)
-
-    def _modePreConnect(self):
-        super()._modePreConnect()
-
-    def _modePreCheck(self):
-        super()._modePreCheck()
-
-    def _modeDuringCheck(self):
-        super()._modeDuringCheck()
-
-    def _modePreMeasure(self):
-        super()._modePreMeasure()
-
-    def _modeDuringMeasure(self):
-        super()._modeDuringMeasure()
 
     def check(self):
         print('subclass checking...')
