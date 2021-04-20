@@ -128,13 +128,29 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
 
         self._params = 0
 
-        self._spinPowHet = QDoubleSpinBox(parent=self)
-        self._spinPowHet.setMinimum(-50)
-        self._spinPowHet.setMaximum(50)
-        self._spinPowHet.setSingleStep(1)
-        self._spinPowHet.setValue(-10)
-        self._spinPowHet.setSuffix(' дБм')
-        self._devices._layout.addRow('Pгет=', self._spinPowHet)
+        self._spinPowHetMin = QDoubleSpinBox(parent=self)
+        self._spinPowHetMin.setMinimum(-50)
+        self._spinPowHetMin.setMaximum(50)
+        self._spinPowHetMin.setSingleStep(1)
+        self._spinPowHetMin.setValue(-10)
+        self._spinPowHetMin.setSuffix(' дБм')
+        self._devices._layout.addRow('Pгет мин=', self._spinPowHetMin)
+
+        self._spinPowHetMax = QDoubleSpinBox(parent=self)
+        self._spinPowHetMax.setMinimum(-50)
+        self._spinPowHetMax.setMaximum(50)
+        self._spinPowHetMax.setSingleStep(1)
+        self._spinPowHetMax.setValue(10)
+        self._spinPowHetMax.setSuffix(' дБм')
+        self._devices._layout.addRow('Pгет макс=', self._spinPowHetMax)
+
+        self._spinPowHetDelta = QDoubleSpinBox(parent=self)
+        self._spinPowHetDelta.setMinimum(-50)
+        self._spinPowHetDelta.setMaximum(50)
+        self._spinPowHetDelta.setSingleStep(1)
+        self._spinPowHetDelta.setValue(1)
+        self._spinPowHetDelta.setSuffix(' дБм')
+        self._devices._layout.addRow('ΔPгет=', self._spinPowHetDelta)
 
         self._spinFhetMin = QDoubleSpinBox(parent=self)
         self._spinFhetMin.setMinimum(0)
@@ -215,7 +231,9 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._connectSignals()
 
     def _connectSignals(self):
-        self._spinPowHet.valueChanged.connect(self.on_params_changed)
+        self._spinPowHetMin.valueChanged.connect(self.on_params_changed)
+        self._spinPowHetMax.valueChanged.connect(self.on_params_changed)
+        self._spinPowHetDelta.valueChanged.connect(self.on_params_changed)
         self._spinFhetMin.valueChanged.connect(self.on_params_changed)
         self._spinFhetMax.valueChanged.connect(self.on_params_changed)
         self._spinFhetDelta.valueChanged.connect(self.on_params_changed)
@@ -262,7 +280,9 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
 
     def on_params_changed(self, value):
         params = {
-            'Phet': self._spinPowHet.value(),
+            'Phet_min': self._spinPowHetMin.value(),
+            'Phet_max': self._spinPowHetMax.value(),
+            'Phet_delta': self._spinPowHetDelta.value(),
             'Fhet_min': self._spinFhetMin.value(),
             'Fhet_max': self._spinFhetMax.value(),
             'Fhet_delta': self._spinFhetDelta.value(),
