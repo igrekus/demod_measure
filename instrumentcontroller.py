@@ -95,7 +95,65 @@ class InstrumentController(QObject):
         pass
 
     def _measure_s_params(self):
-        gen1 = self._instruments['Генератор 1']
+        gen1 = self._instruments['P LO']
+        gen2 = self._instruments['P RF']
+        osc = self._instruments['Осциллограф']
+        src = self._instruments['Источник']
+        mult = self._instruments['Мультиметр']
+        pna = self._instruments['Анализатор']
+
+        """
+        питание питоание из интерфейса, предел по току 200мА
+
+        осциллограф - авереджинг
+                        вкл канал 1
+                        вкл канал 2
+                        
+                        кан оффсет 1 = 0
+                        кан оффсет 2 = 0
+                        
+                        кан 1/2 масштаб 50 мВ (scale)
+                        
+                        триггер канал 1 - edge, 0 mV, raising front
+                        
+                        add measurement -> vertical -> amplitude -> chan 1        
+                        add measurement -> vertical -> amplitude -> chan 2
+                        add measurement -> clock -> phase -> src1 = chan 1, src2 = chan 2
+                        add measurement -> clock -> freq -> src1 = chan 1
+
+        p lo: cycle power (Pmin -> Pmax with deltaP)
+                        
+            p lo: set power - п гет вх
+                  ф гет мин = ф мин
+                  ф гет мин = ф макс
+                  дельта ф = дельта ф
+                  (свип по шагу -- цикл в коде)
+            
+                p rf внутр цикл
+                    п вх - п фх
+                    п мин
+                    п макс
+                    дельта п
+                    (цикл по частоте рф генератора с шагом)
+                                    
+                    считаываем ф ло, ф рф, показываем дельту
+                    
+                    src: вкл источник пит
+                    
+                    osc: get min-max measure, calc scale factor on each cycle
+                    
+                    src: read and show src current, src voltage
+                    
+                    osc: get chan 1 v ampl, get chan 2 v amp
+                    osc: get chan 1 v [hase, get chan 2 v phase - calc delta phase
+                    osc: get chan 1 freq
+                    cave to result list  -> plot real time, overlay with different pows
+                    
+                    
+        
+        add measurement delay to gui parameters, clear measurement display for osc to reset avg stats
+        """
+
         return [1, 2, 3]
 
     @pyqtSlot(dict)
