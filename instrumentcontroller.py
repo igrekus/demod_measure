@@ -92,7 +92,12 @@ class InstrumentController(QObject):
         pass
 
     def _init(self):
-        pass
+        self._instruments['P LO'].send('*RST')
+        self._instruments['P RF'].send('*RST')
+        self._instruments['Осциллограф'].send('*RST')
+        self._instruments['Источник'].send('*RST')
+        self._instruments['Мультиметр'].send('*RST')
+        self._instruments['Анализатор'].send('*RST')
 
     def _measure_s_params(self, param, secondary):
         gen1 = self._instruments['P LO']
