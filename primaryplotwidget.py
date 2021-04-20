@@ -1,15 +1,10 @@
-import random
-
 import pyqtgraph as pg
 
 from PyQt6.QtWidgets import QGridLayout, QWidget
 
-
-# from mytools import GraphWidget
-
-
 # https://www.learnpyqt.com/tutorials/plotting-pyqtgraph/
 # https://pyqtgraph.readthedocs.io/en/latest/introduction.html#what-is-pyqtgraph
+
 
 class PrimaryPlotWidget(QWidget):
     label_style = {'color': 'k', 'font-size': '15px'}
