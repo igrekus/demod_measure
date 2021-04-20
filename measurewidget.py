@@ -128,85 +128,85 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
 
         self._params = 0
 
-        self._spinPowHetMin = QDoubleSpinBox(parent=self)
-        self._spinPowHetMin.setMinimum(-50)
-        self._spinPowHetMin.setMaximum(50)
-        self._spinPowHetMin.setSingleStep(1)
-        self._spinPowHetMin.setValue(-10)
-        self._spinPowHetMin.setSuffix(' дБм')
-        self._devices._layout.addRow('Pгет мин=', self._spinPowHetMin)
+        self._spinPloMin = QDoubleSpinBox(parent=self)
+        self._spinPloMin.setMinimum(-50)
+        self._spinPloMin.setMaximum(50)
+        self._spinPloMin.setSingleStep(1)
+        self._spinPloMin.setValue(-10)
+        self._spinPloMin.setSuffix(' дБм')
+        self._devices._layout.addRow('Pгет мин=', self._spinPloMin)
 
-        self._spinPowHetMax = QDoubleSpinBox(parent=self)
-        self._spinPowHetMax.setMinimum(-50)
-        self._spinPowHetMax.setMaximum(50)
-        self._spinPowHetMax.setSingleStep(1)
-        self._spinPowHetMax.setValue(10)
-        self._spinPowHetMax.setSuffix(' дБм')
-        self._devices._layout.addRow('Pгет макс=', self._spinPowHetMax)
+        self._spinPloMax = QDoubleSpinBox(parent=self)
+        self._spinPloMax.setMinimum(-50)
+        self._spinPloMax.setMaximum(50)
+        self._spinPloMax.setSingleStep(1)
+        self._spinPloMax.setValue(10)
+        self._spinPloMax.setSuffix(' дБм')
+        self._devices._layout.addRow('Pгет макс=', self._spinPloMax)
 
-        self._spinPowHetDelta = QDoubleSpinBox(parent=self)
-        self._spinPowHetDelta.setMinimum(-50)
-        self._spinPowHetDelta.setMaximum(50)
-        self._spinPowHetDelta.setSingleStep(1)
-        self._spinPowHetDelta.setValue(1)
-        self._spinPowHetDelta.setSuffix(' дБм')
-        self._devices._layout.addRow('ΔPгет=', self._spinPowHetDelta)
+        self._spinPloDelta = QDoubleSpinBox(parent=self)
+        self._spinPloDelta.setMinimum(-50)
+        self._spinPloDelta.setMaximum(50)
+        self._spinPloDelta.setSingleStep(1)
+        self._spinPloDelta.setValue(1)
+        self._spinPloDelta.setSuffix(' дБм')
+        self._devices._layout.addRow('ΔPгет=', self._spinPloDelta)
 
-        self._spinFhetMin = QDoubleSpinBox(parent=self)
-        self._spinFhetMin.setMinimum(0)
-        self._spinFhetMin.setMaximum(40)
-        self._spinFhetMin.setSingleStep(1)
-        self._spinFhetMin.setValue(1)
-        self._spinFhetMin.setSuffix(' ГГц')
-        self._devices._layout.addRow('Fгет.мин=', self._spinFhetMin)
+        self._spinFloMin = QDoubleSpinBox(parent=self)
+        self._spinFloMin.setMinimum(0)
+        self._spinFloMin.setMaximum(40)
+        self._spinFloMin.setSingleStep(1)
+        self._spinFloMin.setValue(1)
+        self._spinFloMin.setSuffix(' ГГц')
+        self._devices._layout.addRow('Fгет.мин=', self._spinFloMin)
 
-        self._spinFhetMax = QDoubleSpinBox(parent=self)
-        self._spinFhetMax.setMinimum(0)
-        self._spinFhetMax.setMaximum(40)
-        self._spinFhetMax.setSingleStep(1)
-        self._spinFhetMax.setValue(3)
-        self._spinFhetMax.setSuffix(' ГГц')
-        self._devices._layout.addRow('Fгет.макс=', self._spinFhetMax)
+        self._spinFloMax = QDoubleSpinBox(parent=self)
+        self._spinFloMax.setMinimum(0)
+        self._spinFloMax.setMaximum(40)
+        self._spinFloMax.setSingleStep(1)
+        self._spinFloMax.setValue(3)
+        self._spinFloMax.setSuffix(' ГГц')
+        self._devices._layout.addRow('Fгет.макс=', self._spinFloMax)
 
-        self._spinFhetDelta = QDoubleSpinBox(parent=self)
-        self._spinFhetDelta.setMinimum(0)
-        self._spinFhetDelta.setMaximum(40)
-        self._spinFhetDelta.setSingleStep(0.1)
-        self._spinFhetDelta.setValue(0.1)
-        self._spinFhetDelta.setSuffix(' ГГц')
-        self._devices._layout.addRow('ΔFгет=', self._spinFhetDelta)
+        self._spinFloDelta = QDoubleSpinBox(parent=self)
+        self._spinFloDelta.setMinimum(0)
+        self._spinFloDelta.setMaximum(40)
+        self._spinFloDelta.setSingleStep(0.1)
+        self._spinFloDelta.setValue(0.1)
+        self._spinFloDelta.setSuffix(' ГГц')
+        self._devices._layout.addRow('ΔFгет=', self._spinFloDelta)
 
-        self._spinPowIn = QDoubleSpinBox(parent=self)
-        self._spinPowIn.setMinimum(-50)
-        self._spinPowIn.setMaximum(50)
-        self._spinPowIn.setSingleStep(1)
-        self._spinPowIn.setValue(-10)
-        self._spinPowIn.setSuffix(' дБм')
-        self._devices._layout.addRow('Pвх.=', self._spinPowIn)
+        self._spinPrf = QDoubleSpinBox(parent=self)
+        self._spinPrf.setMinimum(-50)
+        self._spinPrf.setMaximum(50)
+        self._spinPrf.setSingleStep(1)
+        self._spinPrf.setValue(-10)
+        self._spinPrf.setSuffix(' дБм')
+        self._devices._layout.addRow('Pвх.=', self._spinPrf)
 
-        self._spinFinMin = QDoubleSpinBox(parent=self)
-        self._spinFinMin.setMinimum(0)
-        self._spinFinMin.setMaximum(40)
-        self._spinFinMin.setSingleStep(1)
-        self._spinFinMin.setValue(1)
-        self._spinFinMin.setSuffix(' ГГц')
-        self._devices._layout.addRow('Fвх.мин=', self._spinFinMin)
+        self._spinFrfMin = QDoubleSpinBox(parent=self)
+        self._spinFrfMin.setMinimum(0)
+        self._spinFrfMin.setMaximum(40)
+        self._spinFrfMin.setSingleStep(1)
+        self._spinFrfMin.setValue(1)
+        self._spinFrfMin.setSuffix(' ГГц')
+        self._devices._layout.addRow('Fвх.мин=', self._spinFrfMin)
 
-        self._spinFinMax = QDoubleSpinBox(parent=self)
-        self._spinFinMax.setMinimum(0)
-        self._spinFinMax.setMaximum(40)
-        self._spinFinMax.setSingleStep(1)
-        self._spinFinMax.setValue(3)
-        self._spinFinMax.setSuffix(' ГГц')
-        self._devices._layout.addRow('Fвх.макс=', self._spinFinMax)
+        self._spinFrfMax = QDoubleSpinBox(parent=self)
+        self._spinFrfMax.setMinimum(0)
+        self._spinFrfMax.setMaximum(40)
+        self._spinFrfMax.setSingleStep(1)
+        self._spinFrfMax.setValue(3)
+        self._spinFrfMax.setSuffix(' ГГц')
+        self._devices._layout.addRow('Fвх.макс=', self._spinFrfMax)
 
-        self._spinFinDelta = QDoubleSpinBox(parent=self)
-        self._spinFinDelta.setMinimum(0)
-        self._spinFinDelta.setMaximum(40)
-        self._spinFinDelta.setSingleStep(0.1)
-        self._spinFinDelta.setValue(0.1)
-        self._spinFinDelta.setSuffix(' ГГц')
-        self._devices._layout.addRow('ΔFвх.=', self._spinFinDelta)
+        self._spinFrfDelta = QDoubleSpinBox(parent=self)
+        self._spinFrfDelta.setMinimum(0)
+        self._spinFrfDelta.setMaximum(40)
+        self._spinFrfDelta.setSingleStep(0.1)
+        self._spinFrfDelta.setValue(0.1)
+        self._spinFrfDelta.setSuffix(' ГГц')
+        self._devices._layout.addRow('ΔFвх.=', self._spinFrfDelta)
 
         self._spinUsrc = QDoubleSpinBox(parent=self)
         self._spinUsrc.setMinimum(4.75)
@@ -231,17 +231,17 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._connectSignals()
 
     def _connectSignals(self):
-        self._spinPowHetMin.valueChanged.connect(self.on_params_changed)
-        self._spinPowHetMax.valueChanged.connect(self.on_params_changed)
-        self._spinPowHetDelta.valueChanged.connect(self.on_params_changed)
-        self._spinFhetMin.valueChanged.connect(self.on_params_changed)
-        self._spinFhetMax.valueChanged.connect(self.on_params_changed)
-        self._spinFhetDelta.valueChanged.connect(self.on_params_changed)
+        self._spinPloMin.valueChanged.connect(self.on_params_changed)
+        self._spinPloMax.valueChanged.connect(self.on_params_changed)
+        self._spinPloDelta.valueChanged.connect(self.on_params_changed)
+        self._spinFloMin.valueChanged.connect(self.on_params_changed)
+        self._spinFloMax.valueChanged.connect(self.on_params_changed)
+        self._spinFloDelta.valueChanged.connect(self.on_params_changed)
 
-        self._spinPowIn.valueChanged.connect(self.on_params_changed)
-        self._spinFinMin.valueChanged.connect(self.on_params_changed)
-        self._spinFinMax.valueChanged.connect(self.on_params_changed)
-        self._spinFinDelta.valueChanged.connect(self.on_params_changed)
+        self._spinPrf.valueChanged.connect(self.on_params_changed)
+        self._spinFrfMin.valueChanged.connect(self.on_params_changed)
+        self._spinFrfMax.valueChanged.connect(self.on_params_changed)
+        self._spinFrfDelta.valueChanged.connect(self.on_params_changed)
 
         self._spinUsrc.valueChanged.connect(self.on_params_changed)
 
@@ -280,17 +280,17 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
 
     def on_params_changed(self, value):
         params = {
-            'Phet_min': self._spinPowHetMin.value(),
-            'Phet_max': self._spinPowHetMax.value(),
-            'Phet_delta': self._spinPowHetDelta.value(),
-            'Fhet_min': self._spinFhetMin.value(),
-            'Fhet_max': self._spinFhetMax.value(),
-            'Fhet_delta': self._spinFhetDelta.value(),
+            'Plo_min': self._spinPloMin.value(),
+            'Plo_max': self._spinPloMax.value(),
+            'Plo_delta': self._spinPloDelta.value(),
+            'Flo_min': self._spinFloMin.value(),
+            'Flo_max': self._spinFloMax.value(),
+            'Flo_delta': self._spinFloDelta.value(),
 
-            'Pin': self._spinPowIn.value(),
-            'Fin_min': self._spinFinMin.value(),
-            'Fin_max': self._spinFinMax.value(),
-            'Fin_delta': self._spinFinDelta.value(),
+            'Prf': self._spinPrf.value(),
+            'Frf_min': self._spinFrfMin.value(),
+            'Frf_max': self._spinFrfMax.value(),
+            'Frf_delta': self._spinFrfDelta.value(),
 
             'Usrc': self._spinUsrc.value(),
 
