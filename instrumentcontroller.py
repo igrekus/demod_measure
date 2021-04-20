@@ -86,7 +86,7 @@ class InstrumentController(QObject):
         self._clear()
         self._init()
 
-        return self._measure_s_params()
+        return self._measure_s_params(param, secondary)
 
     def _clear(self):
         pass
@@ -94,7 +94,7 @@ class InstrumentController(QObject):
     def _init(self):
         pass
 
-    def _measure_s_params(self):
+    def _measure_s_params(self, param, secondary):
         gen1 = self._instruments['P LO']
         gen2 = self._instruments['P RF']
         osc = self._instruments['Осциллограф']
