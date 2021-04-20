@@ -13,11 +13,11 @@ class InstrumentController(QObject):
         super().__init__(parent=parent)
 
         self.requiredInstruments = {
-            'Осциллограф': OscilloscopeFactory('GPIB1::10::INSTR'),
-            'Генератор 1': GeneratorFactory('GPIB1::10::INSTR'),
-            'Генератор 2': GeneratorFactory('GPIB1::10::INSTR'),
-            'Источник': SourceFactory('GPIB1::10::INSTR'),
-            'Мультиметр': MultimeterFactory('GPIB1::10::INSTR'),
+            'Осциллограф': OscilloscopeFactory('GPIB1::7::INSTR'),
+            'P LO': GeneratorFactory('GPIB1::6::INSTR'),
+            'P RF': GeneratorFactory('GPIB1::20::INSTR'),
+            'Источник': SourceFactory('GPIB1::3::INSTR'),
+            'Мультиметр': MultimeterFactory('GPIB1::22::INSTR'),
             'Анализатор': AnalyzerFactory('GPIB1::18::INSTR'),
         }
 
