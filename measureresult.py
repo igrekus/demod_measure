@@ -18,11 +18,15 @@ class MeasureResult:
     def __bool__(self):
         return self.ready
 
-    def _init(self):
-        self._secondaryParams.clear()
-
     def _process(self):
         self.ready = True
+
+    def clear(self):
+        self._raw.clear()
+        self.headers.clear()
+        self._secondaryParams.clear()
+
+        self.ready = False
 
     def set_secondary_params(self, params):
         self._secondaryParams = dict(**params)

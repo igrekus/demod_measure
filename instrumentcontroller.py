@@ -94,7 +94,7 @@ class InstrumentController(QObject):
         return True
 
     def _clear(self):
-        pass
+        self.result.clear()
 
     def _init(self):
         self._instruments['P LO'].send('*RST')
