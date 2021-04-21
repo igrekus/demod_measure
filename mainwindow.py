@@ -48,6 +48,8 @@ class MainWindow(QMainWindow):
         self._measureWidget.measureComplete.connect(self._measureModel.update)
         self._measureWidget.measureComplete.connect(self.on_measureComplete)
 
+        self._instrumentController.pointReady.connect(self.on_point_ready)
+
         # self._ui.tableMeasure.setModel(self._measureModel)
 
         self.refreshView()
@@ -102,3 +104,6 @@ class MainWindow(QMainWindow):
         self._instrumentController.result.only_main_states = only_main_states
         self._plotWidget.only_main_states = only_main_states
 
+    @pyqtSlot()
+    def on_point_ready(self):
+        print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', self._instrumentController.result.last_point)

@@ -2,12 +2,11 @@ import random
 
 
 class MeasureResult:
-    def __init__(self, raw, secondaryParams):
-        self.headers = list()
-        self._secondaryParams = secondaryParams
+    def __init__(self):
+        self._secondaryParams = None
         self.ready = False
-
-        self.raw = raw
+        self.headers = list()
+        self._raw = list()
 
         self.data1 = [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [random.randint(0, 50) for _ in range(10)]]
         self.data2 = [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [random.randint(0, 50) for _ in range(10)]]
@@ -24,3 +23,13 @@ class MeasureResult:
 
     def _process(self):
         self.ready = True
+
+    def set_secondary_params(self, params):
+        self._secondaryParams = dict(**params)
+
+    def add_point(self, data):
+        self._raw.append(data)
+
+    @property
+    def last_point(self):
+        return self._raw[-1]
