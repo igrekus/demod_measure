@@ -7,16 +7,22 @@ from deviceselectwidget import DeviceSelectWidget
 
 class MeasureTask(QRunnable):
 
-    def __init__(self, fn, end, *args, **kwargs):
+    def __init__(self, fn, end, token, *args, **kwargs):
         super().__init__()
         self.fn = fn
         self.end = end
+        self.token = token
         self.args = args
         self.kwargs = kwargs
 
     def run(self):
-        self.fn(*self.args, **self.kwargs)
+        self.fn(self.token, *self.args, **self.kwargs)
         self.end()
+
+
+class CancelToken:
+    def __init__(self):
+        self.cancelled = False
 
 
 class MeasureWidget(QWidget):
@@ -47,16 +53,16 @@ class MeasureWidget(QWidget):
                                         self._selectedDevice))
 
     def checkTaskComplete(self):
-        print('check complete')
         if not self._controller.present:
             print('sample not found')
             # QMessageBox.information(self, 'Ошибка', 'Не удалось найти образец, проверьте подключение')
             self._modePreCheck()
-            return
+            return False
 
         print('found sample')
         self._modePreMeasure()
         self.sampleFound.emit()
+        return True
 
     def measure(self):
         print('measuring...')
@@ -65,14 +71,17 @@ class MeasureWidget(QWidget):
                                         self.measureTaskComplete,
                                         self._selectedDevice))
 
+    def cancel(self):
+        pass
+
     def measureTaskComplete(self):
-        print('measure complete')
         if not self._controller.hasResult:
             print('error during measurement')
-            return
+            return False
 
         self._modePreCheck()
         self.measureComplete.emit()
+        return True
 
     @pyqtSlot()
     def on_instrumentsConnected(self):
@@ -89,6 +98,11 @@ class MeasureWidget(QWidget):
         self.measureStarted.emit()
         self.measure()
 
+    @pyqtSlot()
+    def on_btnCancel_clicked(self):
+        print('cancel click')
+        self.cancel()
+
     @pyqtSlot(int)
     def on_selectedChanged(self, value):
         self._selectedDevice = value
@@ -97,26 +111,31 @@ class MeasureWidget(QWidget):
     def _modePreConnect(self):
         self._ui.btnCheck.setEnabled(False)
         self._ui.btnMeasure.setEnabled(False)
+        self._ui.btnCancel.setEnabled(False)
         self._devices.enabled = True
 
     def _modePreCheck(self):
         self._ui.btnCheck.setEnabled(True)
         self._ui.btnMeasure.setEnabled(False)
+        self._ui.btnCancel.setEnabled(False)
         self._devices.enabled = True
 
     def _modeDuringCheck(self):
         self._ui.btnCheck.setEnabled(False)
         self._ui.btnMeasure.setEnabled(False)
+        self._ui.btnCancel.setEnabled(False)
         self._devices.enabled = False
 
     def _modePreMeasure(self):
         self._ui.btnCheck.setEnabled(False)
         self._ui.btnMeasure.setEnabled(True)
+        self._ui.btnCancel.setEnabled(False)
         self._devices.enabled = False
 
     def _modeDuringMeasure(self):
         self._ui.btnCheck.setEnabled(False)
         self._ui.btnMeasure.setEnabled(False)
+        self._ui.btnCancel.setEnabled(True)
         self._devices.enabled = False
 
 
@@ -125,6 +144,8 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
 
     def __init__(self, parent=None, controller=None):
         super().__init__(parent=parent, controller=controller)
+
+        self._token = CancelToken()
 
         self._params = 0
 
@@ -249,34 +270,45 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
 
         self._spinLoss.valueChanged.connect(self.on_params_changed)
 
-    def _modePreConnect(self):
-        super()._modePreConnect()
-
-    def _modePreCheck(self):
-        super()._modePreCheck()
-
-    def _modeDuringCheck(self):
-        super()._modeDuringCheck()
-
-    def _modePreMeasure(self):
-        super()._modePreMeasure()
-
-    def _modeDuringMeasure(self):
-        super()._modeDuringMeasure()
-
     def check(self):
         print('subclass checking...')
         self._modeDuringCheck()
-        self._threads.start(MeasureTask(self._controller.check,
-                                        self.checkTaskComplete,
-                                        [self._selectedDevice, self._params]))
+        self._threads.start(
+            MeasureTask(
+                self._controller.check,
+                self.checkTaskComplete,
+                self._token,
+                [self._selectedDevice, self._params]
+            ))
+
+    def checkTaskComplete(self):
+        res = super(MeasureWidgetWithSecondaryParameters, self).checkTaskComplete()
+        if not res:
+            self._token = CancelToken()
+        return res
 
     def measure(self):
         print('subclass measuring...')
         self._modeDuringMeasure()
-        self._threads.start(MeasureTask(self._controller.measure,
-                                        self.measureTaskComplete,
-                                        [self._selectedDevice, self._params]))
+        self._threads.start(
+            MeasureTask(
+                self._controller.measure,
+                self.measureTaskComplete,
+                self._token,
+                [self._selectedDevice, self._params]
+            ))
+
+    def measureTaskComplete(self):
+        res = super(MeasureWidgetWithSecondaryParameters, self).measureTaskComplete()
+        if not res:
+            self._token = CancelToken()
+            self._modePreCheck()
+        return res
+
+    def cancel(self):
+        print('cancelling task')
+        if not self._token.cancelled:
+            self._token.cancelled = True
 
     def on_params_changed(self, value):
         params = {

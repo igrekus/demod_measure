@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>243</width>
-    <height>62</height>
+    <width>321</width>
+    <height>64</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -91,6 +91,16 @@
           </property>
           <property name="text">
            <string>Измерить</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnCancel">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Отменить</string>
           </property>
          </widget>
         </item>

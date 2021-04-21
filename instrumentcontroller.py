@@ -60,35 +60,34 @@ class InstrumentController(QObject):
         }
         return all(self._instruments.values())
 
-    def check(self, params):
-        print(f'call check with {params}')
+    def check(self, token, params):
+        print(f'call check with {token} {params}')
         device, secondary = params
-        self.present = self._check(device, secondary)
+        self.present = self._check(token, device, secondary)
         print('sample pass')
 
-    def _check(self, device, secondary):
+    def _check(self, token, device, secondary):
         print(f'launch check with {self.deviceParams[device]} {self.secondaryParams}')
-        return self._runCheck(self.deviceParams[device], self.secondaryParams)
-
-    def _runCheck(self, param, secondary):
-        print(f'run check with {param}, {secondary}')
         return True
 
-    def measure(self, params):
-        print(f'call measure with {params}')
+    def measure(self, token, params):
+        print(f'call measure with {token} {params}')
         device, _ = params
-        self.result = MeasureResult(self._measure(device), self.secondaryParams)
-        self.hasResult = bool(self.result)
+        try:
+            self.result = MeasureResult(self._measure(token, device), self.secondaryParams)
+            self.hasResult = bool(self.result)
+        except RuntimeError as ex:
+            print('runtime error:', ex)
 
-    def _measure(self, device):
+    def _measure(self, token, device):
         param = self.deviceParams[device]
         secondary = self.secondaryParams
-        print(f'launch measure with {param} {secondary}')
+        print(f'launch measure with {token} {param} {secondary}')
 
         self._clear()
         self._init()
 
-        return self._measure_s_params(param, secondary)
+        return self._measure_s_params(token, param, secondary)
 
     def _clear(self):
         pass
@@ -101,7 +100,7 @@ class InstrumentController(QObject):
         self._instruments['Мультиметр'].send('*RST')
         self._instruments['Анализатор'].send('*RST')
 
-    def _measure_s_params(self, param, secondary):
+    def _measure_s_params(self, token, param, secondary):
         gen_lo = self._instruments['P LO']
         gen_rf = self._instruments['P RF']
         osc = self._instruments['Осциллограф']
@@ -167,6 +166,9 @@ class InstrumentController(QObject):
                 gen_lo.send(f'SOUR:FREQ {freq_lo}GHz')
 
                 for freq_rf in freq_rf_values:
+                    if token.cancelled:
+                        raise RuntimeError('measurement cancelled')
+
                     gen_rf.send(f'SOUR:FREQ {freq_rf}GHz')
 
                     # TODO hoist out of the loops
