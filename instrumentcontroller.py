@@ -199,29 +199,35 @@ class InstrumentController(QObject):
                     osc_ch1_freq = float(osc.query(':MEASure:FREQuency? CHANnel1'))
 
                     # TODO record live data
+                    p_lo_read = float(gen_lo.query('SOUR:POW?'))
+                    f_lo_read = float(gen_lo.query('SOUR:FREQ?'))
+
+                    p_rf_read = float(gen_rf.query('SOUR:POW?'))
+                    f_rf_read = float(gen_rf.query('SOUR:FREQ?'))
+
                     u_src_read = float(src.query('VOLT?'))
                     i_src_read = float(src.query('CURR?'))
 
-                    f_lo_read = gen_lo.query('SOUR:FREQ?')
-                    f_rf_read = gen_rf.query('SOUR:FREQ?')
-
                     u_src_read = random.randint(1, 100)
 
-                    data_to_report = {
+                    raw_point = {
+                        'p_lo': p_lo_read,
+                        'f_lo': f_lo_read,
+                        'p_rf': p_rf_read,
+                        'f_rf': f_rf_read,
                         'u_src': u_src_read,
                         'i_src': i_src_read,
-                        'f_lo': f_lo_read,
-                        'f_rf': f_rf_read,
                         'ch1_amp': osc_ch1_amp,
                         'ch2_amp': osc_ch2_amp,
                         'phase': osc_phase,
                         'ch1_freq': osc_phase,
                     }
                     # to show:
-                    # p_lo, f_lo
-                    # p_rf, f_rf
-                    # u_src, i_src
-                    # ch1_amp. ch2_amp, ch2_amp - ch1_amp, phase, ch1_freq
+                    # + p_lo, f_lo
+                    # + p_rf, f_rf
+                    # + u_src, i_src
+                    # + ch1_amp. ch2_amp, ch2_amp - ch1_amp, phase, ch1_freq
+
                     # расчеты:
                     # мощность сигнала пч по каналу 1: Ppch = 30 + 1 * log10(((ch1_amp/2 * 0.001) ^ 2) / 100)
                     # к-т передачи с учетом потерь: Kp = Ppch - Prf + Pbal
@@ -231,14 +237,13 @@ class InstrumentController(QObject):
                     # подавление зерк. канала: azk = 10 * log10((1 + aerr_times ^ 2 - 2 * aerr_times * cos(rad(pherr)))
                     # / (1 + aerr_times ^ 2 + 2 * aerr_times * cos(rad(pherr))))
 
-                    self._report_measure_point(data_to_report)
+                    self._add_measure_point(raw_point)
 
                     res.append([osc_ch1_amp, osc_ch2_amp, osc_phase, osc_ch1_freq])
 
         return res
 
-    def _report_measure_point(self, data):
-        # TODO implement data send to UI
+    def _add_measure_point(self, data):
         print('measured point:', data)
         self.result.add_point(data)
         self.pointReady.emit()

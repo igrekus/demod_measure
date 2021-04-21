@@ -1,3 +1,5 @@
+from textwrap import dedent
+
 from PyQt6 import uic
 from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot
@@ -106,7 +108,4 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def on_point_ready(self):
-        point = self._instrumentController.result.last_point
-        stats = f"""Usrc= {point['u_src']}"""
-
-        self._ui.pteditProgress.setPlainText(stats)
+        self._ui.pteditProgress.setPlainText(self._instrumentController.result.report)
