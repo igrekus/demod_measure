@@ -1,9 +1,10 @@
+import random
 import time
 
 import numpy as np
 
 from os.path import isfile
-from PyQt6.QtCore import QObject, pyqtSlot
+from PyQt6.QtCore import QObject, pyqtSlot, pyqtSignal
 
 from instr.instrumentfactory import mock_enabled, OscilloscopeFactory, GeneratorFactory, SourceFactory, \
     MultimeterFactory, AnalyzerFactory
@@ -11,6 +12,8 @@ from measureresult import MeasureResult
 
 
 class InstrumentController(QObject):
+    pointReady = pyqtSignal()
+
     def __init__(self, parent=None):
         super().__init__(parent=parent)
 
@@ -43,7 +46,7 @@ class InstrumentController(QObject):
         self.hasResult = False
         self.only_main_states = False
 
-        self.result = None
+        self.result = MeasureResult()
 
     def __str__(self):
         return f'{self._instruments}'
@@ -74,8 +77,10 @@ class InstrumentController(QObject):
         print(f'call measure with {token} {params}')
         device, _ = params
         try:
-            self.result = MeasureResult(self._measure(token, device), self.secondaryParams)
-            self.hasResult = bool(self.result)
+            self.result.set_secondary_params(self.secondaryParams)
+            self._measure(token, device)
+            # self.hasResult = bool(self.result)
+            self.hasResult = True   # HACK
         except RuntimeError as ex:
             print('runtime error:', ex)
 
@@ -86,11 +91,11 @@ class InstrumentController(QObject):
 
         self._clear()
         self._init()
-
-        return self._measure_s_params(token, param, secondary)
+        self._measure_s_params(token, param, secondary)
+        return True
 
     def _clear(self):
-        pass
+        self.result.clear()
 
     def _init(self):
         self._instruments['P LO'].send('*RST')
@@ -184,6 +189,7 @@ class InstrumentController(QObject):
                     # osc.send(':MEASure:FREQuency CHANnel1')
                     osc.send(':CDISplay')
 
+                    time.sleep(1)
                     if not mock_enabled:
                         time.sleep(3)
 
@@ -194,31 +200,54 @@ class InstrumentController(QObject):
                     osc_ch1_freq = float(osc.query(':MEASure:FREQuency? CHANnel1'))
 
                     # TODO record live data
+                    p_lo_read = float(gen_lo.query('SOUR:POW?'))
+                    f_lo_read = float(gen_lo.query('SOUR:FREQ?'))
+
+                    p_rf_read = float(gen_rf.query('SOUR:POW?'))
+                    f_rf_read = float(gen_rf.query('SOUR:FREQ?'))
+
                     u_src_read = float(src.query('VOLT?'))
                     i_src_read = float(src.query('CURR?'))
 
-                    f_lo_read = gen_lo.query('SOUR:FREQ?')
-                    f_rf_read = gen_rf.query('SOUR:FREQ?')
+                    u_src_read = random.randint(1, 100)
 
-                    data_to_report = {
+                    raw_point = {
+                        'p_lo': p_lo_read,
+                        'f_lo': f_lo_read,
+                        'p_rf': p_rf_read,
+                        'f_rf': f_rf_read,
                         'u_src': u_src_read,
                         'i_src': i_src_read,
-                        'f_lo': f_lo_read,
-                        'f_rf': f_rf_read,
                         'ch1_amp': osc_ch1_amp,
                         'ch2_amp': osc_ch2_amp,
                         'phase': osc_phase,
                         'ch1_freq': osc_phase,
                     }
-                    self._report_measure_point(data_to_report)
+                    # to show:
+                    # + p_lo, f_lo
+                    # + p_rf, f_rf
+                    # + u_src, i_src
+                    # + ch1_amp. ch2_amp, ch2_amp - ch1_amp, phase, ch1_freq
+
+                    # расчеты:
+                    # мощность сигнала пч по каналу 1: Ppch = 30 + 1 * log10(((ch1_amp/2 * 0.001) ^ 2) / 100)
+                    # к-т передачи с учетом потерь: Kp = Ppch - Prf + Pbal
+                    # амп. ошибка в разах: aerr_times = ch2_amp / chi1_amp
+                    # амп. ош в дБ: aerr_db = 20 * log10(ch2_amp * 0.001) - 20 * log10(ch1_amp * 0.001)
+                    # фаз. ош в град: pherr = delta_pherr + 90
+                    # подавление зерк. канала: azk = 10 * log10((1 + aerr_times ^ 2 - 2 * aerr_times * cos(rad(pherr)))
+                    # / (1 + aerr_times ^ 2 + 2 * aerr_times * cos(rad(pherr))))
+
+                    self._add_measure_point(raw_point)
 
                     res.append([osc_ch1_amp, osc_ch2_amp, osc_phase, osc_ch1_freq])
 
         return res
 
-    def _report_measure_point(self, data):
-        # TODO implement data send to UI
+    def _add_measure_point(self, data):
         print('measured point:', data)
+        self.result.add_point(data)
+        self.pointReady.emit()
 
     @pyqtSlot(dict)
     def on_secondary_changed(self, params):
