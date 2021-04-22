@@ -133,16 +133,16 @@ class InstrumentController(QObject):
 
         osc_avg = 'ON' if secondary['OscAvg'] else 'OFF'
 
-        src.send(f'APPLY {src_u}V,{src_i}mA')
+        src.send(f'APPLY p6v,{src_u}V,{src_i}mA')
 
         osc.send(f':ACQ:AVERage {osc_avg}')
 
-        # osc.send(f':CHANnel1:OFFSet 0')   # no separate command to enable a channel(?)
-        # osc.send(f':CHANnel2:OFFSet 0')
+        osc.send(f':CHANnel1:DISPlay ON')
+        osc.send(f':CHANnel2:DISPlay ON')
 
-        osc.send(':autoscale')
-        osc.send(f':CHANnel1:OFFSet 0')
-        osc.send(f':CHANnel2:OFFSet 0')
+        osc.send(':CHAN1:SCALE 0.05')   # V
+        osc.send(':CHAN2:SCALE 0.05')
+        osc.send(':TIMEBASE:SCALE 10E-8')   # ms / div
 
         osc.send(':TRIGger:MODE EDGE')
         osc.send(':TRIGger:EDGE:SOURCe CHANnel1')
@@ -154,9 +154,6 @@ class InstrumentController(QObject):
         osc.send(':MEASure:PHASe CHANnel1,CHANnel2')
         osc.send(':MEASure:FREQuency CHANnel1')
 
-        osc_ch1_amp = float(osc.query(':MEASure:VAMPlitude? channel1'))
-        osc.send(f':CHANnel1:RANGe {osc_ch1_amp + 0.3 * osc_ch1_amp}')
-
         pow_lo_values = [round(x, 3) for x in np.arange(start=pow_lo_start, stop=pow_lo_end + 0.2, step=pow_lo_step)]
         freq_lo_values = [round(x, 3) for x in np.arange(start=freq_lo_start, stop=freq_lo_end + 0.2, step=freq_lo_step)]
         freq_rf_values = [round(x, 3) for x in np.arange(start=freq_rf_start, stop=freq_rf_end + 0.2, step=freq_rf_step)]
@@ -167,80 +164,102 @@ class InstrumentController(QObject):
         for pow_lo in pow_lo_values:
             gen_lo.send(f'SOUR:POW {pow_lo}dbm')
 
-            for freq_lo in freq_lo_values:
+            for freq_lo, freq_rf in zip(freq_lo_values, freq_rf_values):
+                if token.cancelled:
+                    raise RuntimeError('measurement cancelled')
+
                 gen_lo.send(f'SOUR:FREQ {freq_lo}GHz')
+                gen_rf.send(f'SOUR:FREQ {freq_rf}GHz')
 
-                for freq_rf in freq_rf_values:
-                    if token.cancelled:
-                        raise RuntimeError('measurement cancelled')
+                # TODO hoist out of the loops
+                src.send('OUTPut ON')
 
-                    gen_rf.send(f'SOUR:FREQ {freq_rf}GHz')
+                gen_lo.send(f'OUTP:STAT ON')
+                gen_rf.send(f'OUTP:STAT ON')
 
-                    # TODO hoist out of the loops
-                    gen_lo.send(f'OUTP:STAT ON')
-                    gen_rf.send(f'OUTP:STAT ON')
+                osc.send(':CDISplay')
 
-                    src.send('OUTPut ON')
+                # time.sleep(0.1)
+                # if not mock_enabled:
+                #     time.sleep(3)
 
-                    # osc.send(':MEASure:CLEar')
-                    # osc.send(':MEASure:VAMPlitude channel1')
-                    # osc.send(':MEASure:VAMPlitude channel2')
-                    # osc.send(':MEASure:PHASe CHANnel1,CHANnel2')
-                    # osc.send(':MEASure:FREQuency CHANnel1')
-                    osc.send(':CDISplay')
+                # label, current, result(-), min, max, mean, std dev, times
+                # TODO read mean instead of current
+                stats = osc.query(':MEASure:RESults?')
 
-                    time.sleep(1)
-                    if not mock_enabled:
-                        time.sleep(3)
+                osc_ch1_amp = float(osc.query(':MEASure:VAMPlitude? channel1'))
+                osc_ch2_amp = float(osc.query(':MEASure:VAMPlitude? channel2'))
+                osc_phase = float(osc.query(':MEASure:PHASe? CHANnel1,CHANnel2'))
+                osc_ch1_freq = float(osc.query(':MEASure:FREQuency? CHANnel1'))
 
-                    osc_ch1_amp = float(osc.query(':MEASure:VAMPlitude? channel1'))
-                    osc.send(f':CHANnel1:RANGe {osc_ch1_amp + 0.3 * osc_ch1_amp}')
-                    osc_ch2_amp = float(osc.query(':MEASure:VAMPlitude? channel2'))
-                    osc_phase = float(osc.query(':MEASure:PHASe? CHANnel1,CHANnel2'))
-                    osc_ch1_freq = float(osc.query(':MEASure:FREQuency? CHANnel1'))
+                timebase = (1 / (abs(freq_rf - freq_lo) * 10_000_000)) * 0.01
+                osc.send(f':TIMEBASE:SCALE {timebase}')   # ms / div
+                osc.send(f':CHANnel1:OFFSet 0')
+                osc.send(f':CHANnel2:OFFSet 0')
 
-                    # TODO record live data
-                    p_lo_read = float(gen_lo.query('SOUR:POW?'))
-                    f_lo_read = float(gen_lo.query('SOUR:FREQ?'))
+                rng = osc_ch1_amp + 0.3 * osc_ch1_amp
+                osc.send(f':CHANnel1:RANGe {rng}')
+                osc.send(f':CHANnel2:RANGe {rng}')
 
-                    p_rf_read = float(gen_rf.query('SOUR:POW?'))
-                    f_rf_read = float(gen_rf.query('SOUR:FREQ?'))
+                if not mock_enabled:
+                    while rng > 1_000_000:
+                        osc.send(f':CHANnel1:RANGe 0.2')
+                        osc.send(f':CHANnel2:RANGe 0.2')
 
-                    u_src_read = float(src.query('VOLT?'))
-                    i_src_read = float(src.query('CURR?'))
+                        osc.send(':CDIS')
 
-                    u_src_read = random.randint(1, 100)
+                        time.sleep(2)
+                        osc_ch1_amp = float(osc.query(':MEASure:VAMPlitude? channel1'))
+                        rng = osc_ch1_amp + 0.3 * osc_ch1_amp
+                        osc.send(f':CHANnel1:RANGe {rng}')
+                        osc.send(f':CHANnel2:RANGe {rng}')
 
-                    raw_point = {
-                        'p_lo': p_lo_read,
-                        'f_lo': f_lo_read,
-                        'p_rf': p_rf_read,
-                        'f_rf': f_rf_read,
-                        'u_src': u_src_read,
-                        'i_src': i_src_read,
-                        'ch1_amp': osc_ch1_amp,
-                        'ch2_amp': osc_ch2_amp,
-                        'phase': osc_phase,
-                        'ch1_freq': osc_phase,
-                    }
-                    # to show:
-                    # + p_lo, f_lo
-                    # + p_rf, f_rf
-                    # + u_src, i_src
-                    # + ch1_amp. ch2_amp, ch2_amp - ch1_amp, phase, ch1_freq
+                # TODO record live data
+                p_lo_read = float(gen_lo.query('SOUR:POW?'))
+                f_lo_read = float(gen_lo.query('SOUR:FREQ?'))
 
-                    # расчеты:
-                    # мощность сигнала пч по каналу 1: Ppch = 30 + 1 * log10(((ch1_amp/2 * 0.001) ^ 2) / 100)
-                    # к-т передачи с учетом потерь: Kp = Ppch - Prf + Pbal
-                    # амп. ошибка в разах: aerr_times = ch2_amp / chi1_amp
-                    # амп. ош в дБ: aerr_db = 20 * log10(ch2_amp * 0.001) - 20 * log10(ch1_amp * 0.001)
-                    # фаз. ош в град: pherr = delta_pherr + 90
-                    # подавление зерк. канала: azk = 10 * log10((1 + aerr_times ^ 2 - 2 * aerr_times * cos(rad(pherr)))
-                    # / (1 + aerr_times ^ 2 + 2 * aerr_times * cos(rad(pherr))))
+                p_rf_read = float(gen_rf.query('SOUR:POW?'))
+                f_rf_read = float(gen_rf.query('SOUR:FREQ?'))
 
-                    self._add_measure_point(raw_point)
+                u_src_read = float(src.query('MEAS:VOLT?'))
+                i_src_read = float(src.query('MEAS:CURR?'))   # TODO read measured values
 
-                    res.append([osc_ch1_amp, osc_ch2_amp, osc_phase, osc_ch1_freq])
+                # u_src_read = random.randint(1, 100)
+
+                raw_point = {
+                    'p_lo': p_lo_read,
+                    'f_lo': f_lo_read,
+                    'p_rf': p_rf_read,
+                    'f_rf': f_rf_read,
+                    'u_src': u_src_read,
+                    'i_src': i_src_read,
+                    'ch1_amp': osc_ch1_amp,
+                    'ch2_amp': osc_ch2_amp,
+                    'phase': osc_phase,
+                    'ch1_freq': osc_ch1_freq,
+                }
+                # to show:
+                # + p_lo, f_lo
+                # + p_rf, f_rf
+                # + u_src, i_src
+                # + ch1_amp. ch2_amp, ch2_amp - ch1_amp, phase, ch1_freq
+
+                # расчеты:
+                # мощность сигнала пч по каналу 1: Ppch = 30 + 1 * log10(((ch1_amp/2 * 0.001) ^ 2) / 100)
+                # к-т передачи с учетом потерь: Kp = Ppch - Prf + Pbal
+                # амп. ошибка в разах: aerr_times = ch2_amp / chi1_amp
+                # амп. ош в дБ: aerr_db = 20 * log10(ch2_amp * 0.001) - 20 * log10(ch1_amp * 0.001)
+                # фаз. ош в град: pherr = delta_pherr + 90
+                # подавление зерк. канала: azk = 10 * log10((1 + aerr_times ^ 2 - 2 * aerr_times * cos(rad(pherr)))
+                # / (1 + aerr_times ^ 2 + 2 * aerr_times * cos(rad(pherr))))
+
+                print(raw_point)
+                self._add_measure_point(raw_point)
+
+                res.append([raw_point, stats])
+
+        # with open('out.txt', mode='wt', encoding='utf-8') as f:
+        #     f.send(str(res))
 
         return res
 
