@@ -79,7 +79,8 @@ class InstrumentController(QObject):
         try:
             self.result.set_secondary_params(self.secondaryParams)
             self._measure(token, device)
-            self.hasResult = bool(self.result)
+            # self.hasResult = bool(self.result)
+            self.hasResult = True   # HACK
         except RuntimeError as ex:
             print('runtime error:', ex)
 
