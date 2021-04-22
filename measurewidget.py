@@ -161,7 +161,7 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinPloMax.setMinimum(-50)
         self._spinPloMax.setMaximum(50)
         self._spinPloMax.setSingleStep(1)
-        self._spinPloMax.setValue(10)
+        self._spinPloMax.setValue(-10)
         self._spinPloMax.setSuffix(' дБм')
         self._devices._layout.addRow('Pгет макс=', self._spinPloMax)
 
@@ -177,7 +177,7 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinFloMin.setMinimum(0)
         self._spinFloMin.setMaximum(40)
         self._spinFloMin.setSingleStep(1)
-        self._spinFloMin.setValue(1)
+        self._spinFloMin.setValue(0.1)
         self._spinFloMin.setSuffix(' ГГц')
         self._devices._layout.addRow('Fгет.мин=', self._spinFloMin)
 
@@ -209,7 +209,7 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinFrfMin.setMinimum(0)
         self._spinFrfMin.setMaximum(40)
         self._spinFrfMin.setSingleStep(1)
-        self._spinFrfMin.setValue(1)
+        self._spinFrfMin.setValue(0.11)
         self._spinFrfMin.setSuffix(' ГГц')
         self._devices._layout.addRow('Fвх.мин=', self._spinFrfMin)
 
@@ -217,7 +217,7 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinFrfMax.setMinimum(0)
         self._spinFrfMax.setMaximum(40)
         self._spinFrfMax.setSingleStep(1)
-        self._spinFrfMax.setValue(3)
+        self._spinFrfMax.setValue(3.1)
         self._spinFrfMax.setSuffix(' ГГц')
         self._devices._layout.addRow('Fвх.макс=', self._spinFrfMax)
 
