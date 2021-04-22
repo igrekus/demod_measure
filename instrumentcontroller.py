@@ -214,7 +214,6 @@ class InstrumentController(QObject):
                         osc.send(f':CHANnel1:RANGe {rng}')
                         osc.send(f':CHANnel2:RANGe {rng}')
 
-                # TODO record live data
                 p_lo_read = float(gen_lo.query('SOUR:POW?'))
                 f_lo_read = float(gen_lo.query('SOUR:FREQ?'))
 
@@ -222,7 +221,7 @@ class InstrumentController(QObject):
                 f_rf_read = float(gen_rf.query('SOUR:FREQ?'))
 
                 u_src_read = float(src.query('MEAS:VOLT?'))
-                i_src_read = float(src.query('MEAS:CURR?'))   # TODO read measured values
+                i_src_read = float(src.query('MEAS:CURR?'))
 
                 # u_src_read = random.randint(1, 100)
 
