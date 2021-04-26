@@ -169,10 +169,10 @@ class PrimaryPlotWidget(QWidget):
         self.clear()
         self._init()
 
-        curve_00_xs, curve_00_ys = self._controller.result.data1
-        curve_01_xs, curve_01_ys = self._controller.result.data2
-        curve_10_xs, curve_10_ys = self._controller.result.data3
-        curve_11_xs, curve_11_ys = self._controller.result.data4
+        curve_00_xs, curve_00_ys = zip(*self._controller.result.data1)
+        curve_01_xs, curve_01_ys = zip(*self._controller.result.data2)
+        curve_10_xs, curve_10_ys = zip(*self._controller.result.data3)
+        curve_11_xs, curve_11_ys = zip(*self._controller.result.data4)
 
         if not self._curve_00:
             self._curve_00 = pg.PlotDataItem(

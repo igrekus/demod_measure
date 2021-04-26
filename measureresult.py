@@ -18,10 +18,10 @@ class MeasureResult:
         self._report = dict()
         self.ready = False
 
-        self.data1 = [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [random.randint(0, 50) for _ in range(10)]]
-        self.data2 = [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [random.randint(0, 50) for _ in range(10)]]
-        self.data3 = [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [random.randint(0, 50) for _ in range(10)]]
-        self.data4 = [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [random.randint(0, 50) for _ in range(10)]]
+        self.data1 = []
+        self.data2 = []
+        self.data3 = []
+        self.data4 = []
 
     def __bool__(self):
         return self.ready
@@ -30,6 +30,7 @@ class MeasureResult:
         self.ready = True
 
     def _process_point(self, data):
+        f_lo = data['f_lo'] / GHz
         ui = data['ch1_amp']
         uq = data['ch2_amp']
         p_rf = data['p_rf']
@@ -45,7 +46,7 @@ class MeasureResult:
                           (1 + a_err_times ** 2 + 2 * a_err_times * cos(radians(ph_err))))
         self._report = {
             'p_lo': data['p_lo'],
-            'f_lo': data['f_lo'] / GHz,
+            'f_lo': f_lo,
             'p_rf': p_rf,
             'f_rf': data['f_rf'] / GHz,
             'u_src': round(data['u_src'], 1),
@@ -64,11 +65,10 @@ class MeasureResult:
             'a_zk': round(a_zk, 2),
         }
 
-        ln = len(self._report)
-        self.data1 = [range(ln), [random.randint(0, 50) for _ in range(ln)]]
-        self.data2 = [range(ln), [random.randint(0, 50) for _ in range(ln)]]
-        self.data3 = [range(ln), [random.randint(0, 50) for _ in range(ln)]]
-        self.data4 = [range(ln), [random.randint(0, 50) for _ in range(ln)]]
+        self.data1.append([f_lo, kp_loss])
+        self.data2.append([f_lo, a_err_db])
+        self.data3.append([f_lo, ph_err])
+        self.data4.append([f_lo, a_zk])
 
     def clear(self):
         self._secondaryParams.clear()
