@@ -1,3 +1,4 @@
+import ast
 import random
 import time
 
@@ -160,6 +161,11 @@ class InstrumentController(QObject):
 
         gen_rf.send(f'SOUR:POW {pow_rf}dbm')
 
+        if mock_enabled:
+            index = 0
+            with open('mock_data/meas_1_-10db.txt', mode='rt', encoding='utf-8') as f:
+                mocked_raw_data = ast.literal_eval(''.join(f.readlines()))
+
         res = []
         for pow_lo in pow_lo_values:
             gen_lo.send(f'SOUR:POW {pow_lo}dbm')
@@ -223,8 +229,6 @@ class InstrumentController(QObject):
                 u_src_read = float(src.query('MEAS:VOLT?'))
                 i_src_read = float(src.query('MEAS:CURR?'))
 
-                # u_src_read = random.randint(1, 100)
-
                 raw_point = {
                     'p_lo': p_lo_read,
                     'f_lo': f_lo_read,
@@ -252,7 +256,11 @@ class InstrumentController(QObject):
                 # подавление зерк. канала: azk = 10 * log10((1 + aerr_times ^ 2 - 2 * aerr_times * cos(rad(pherr)))
                 # / (1 + aerr_times ^ 2 + 2 * aerr_times * cos(rad(pherr))))
 
-                print(raw_point)
+                if mock_enabled:
+                    raw_point, stats = mocked_raw_data[index]
+                    index += 1
+
+                print(raw_point, stats)
                 self._add_measure_point(raw_point)
 
                 res.append([raw_point, stats])

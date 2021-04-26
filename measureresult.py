@@ -1,5 +1,12 @@
 import random
+
 from textwrap import dedent
+
+KHz = 1_000
+MHz = 1_000_000
+GHz = 1_000_000_000
+mA = 1_000
+mV = 1_000
 
 
 class MeasureResult:
@@ -24,18 +31,24 @@ class MeasureResult:
     def _process_point(self, data):
         self._report = {
             'p_lo': data['p_lo'],
-            'f_lo': data['f_lo'],
+            'f_lo': data['f_lo'] / GHz,
             'p_rf': data['p_rf'],
-            'f_rf': data['f_rf'],
-            'u_src': data['u_src'],
-            'i_src': data['i_src'],
-            'ui': data['ch1_amp'],
-            'uq': data['ch2_amp'],
+            'f_rf': data['f_rf'] / GHz,
+            'u_src': round(data['u_src'], 1),
+            'i_src': round(data['i_src'] * mA, 2),
+            'ui': round(data['ch1_amp'] * mV, 1),
+            'uq': round(data['ch2_amp'] * mV, 1),
             'phase': data['phase'],
-            'freq': data['ch1_freq'],
-            'f_tune': data['f_rf'] - data['f_lo'],
-            'aerr': data['ch1_amp'] - data['ch2_amp'],
+            'freq': round(data['ch1_freq'] / GHz, 3),
+            'f_tune': (data['f_rf'] - data['f_lo']) / MHz,
+            'aerr': round((data['ch1_amp'] - data['ch2_amp']) * mV, 1),
         }
+
+        ln = len(self._report)
+        self.data1 = [range(ln), [random.randint(0, 50) for _ in range(ln)]]
+        self.data2 = [range(ln), [random.randint(0, 50) for _ in range(ln)]]
+        self.data3 = [range(ln), [random.randint(0, 50) for _ in range(ln)]]
+        self.data4 = [range(ln), [random.randint(0, 50) for _ in range(ln)]]
 
     def clear(self):
         self._secondaryParams.clear()
@@ -54,17 +67,17 @@ class MeasureResult:
     @property
     def report(self):
         return dedent("""        Генераторы:
-        Pгет={p_lo}дБм   Fгет={f_lo}ГГц
-        Pвх={p_rf}дБм   Fвх={f_rf}ГГц
-        Fпч={f_tune}МГц
+        Pгет, дБм={p_lo}   Fгет, ГГц={f_lo:0.2f}
+        Pвх, дБм={p_rf}   Fвх, ГГц={f_rf:0.2f}
+        Fпч, МГц={f_tune:0.2f}
         
         Источник питания:
-        U={u_src}В   I={i_src}мА
+        U, В={u_src}   I, мА={i_src}
 
         Осциллограф:
-        F={freq}ГГц
-        UI={ui}мВ   UQ={uq}мВ
-        αош={aerr}мВ   Δφ={phase}º
+        F, ГГц={freq:0.3f}
+        UI, мВ={ui}   UQ, мВ={uq}
+        αош, мВ={aerr}   Δφ, º={phase}
         
         Расчётные параметры:
                    
