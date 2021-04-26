@@ -114,10 +114,6 @@ class InstrumentController(QObject):
         mult = self._instruments['Мультиметр']
         sa = self._instruments['Анализатор']
 
-        secondary = {'Plo_min': -10.0, 'Plo_max': 10.0, 'Plo_delta': 1.0, 'Flo_min': 1.0, 'Flo_max': 3.0,
-                     'Flo_delta': 0.1, 'Prf': -10.0, 'Frf_min': 1.0, 'Frf_max': 3.0, 'Frf_delta': 0.1, 'Usrc': 5.0,
-                     'OscAvg': False, 'Loss': 0.82}
-
         src_u = secondary['Usrc']
         src_i = 200   # mA
         pow_lo_start = secondary['Plo_min']
