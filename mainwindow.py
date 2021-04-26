@@ -1,4 +1,4 @@
-from textwrap import dedent
+import time
 
 from PyQt6 import uic
 from PyQt6.QtWidgets import QMainWindow
@@ -109,3 +109,9 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def on_point_ready(self):
         self._ui.pteditProgress.setPlainText(self._instrumentController.result.report)
+        # self._plotWidget.plot()
+
+    def closeEvent(self, _):
+        self._measureWidget.cancel()
+        while self._measureWidget._threads.activeThreadCount() > 0:
+            time.sleep(0.1)
