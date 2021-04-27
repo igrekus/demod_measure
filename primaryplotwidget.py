@@ -1,6 +1,8 @@
 import pyqtgraph as pg
 
-from PyQt6.QtWidgets import QGridLayout, QWidget
+from PyQt6.QtWidgets import QGridLayout, QWidget, QLabel
+from PyQt6.QtCore import Qt
+
 
 # https://www.learnpyqt.com/tutorials/plotting-pyqtgraph/
 # https://pyqtgraph.readthedocs.io/en/latest/introduction.html#what-is-pyqtgraph
@@ -19,7 +21,12 @@ class PrimaryPlotWidget(QWidget):
 
         self._win = pg.GraphicsLayoutWidget(show=True)
         self._win.setBackground('w')
-        self._grid.addWidget(self._win, 0, 0)
+
+        self._stat_label = QLabel('Mouse position:')
+        self._stat_label.setAlignment(Qt.Alignment.AlignRight)
+
+        self._grid.addWidget(self._stat_label, 0, 0)
+        self._grid.addWidget(self._win, 1, 0)
 
         self._plot_00 = self._win.addPlot(row=1, col=0)
         # self._plot_00.setTitle('К-т преобразования')
@@ -32,9 +39,6 @@ class PrimaryPlotWidget(QWidget):
 
         self._plot_11 = self._win.addPlot(row=2, col=1)
         # self._plot_11.setTitle('αзк')
-
-        self._label = pg.LabelItem(justify='right')
-        self._win.addItem(self._label, row=0, col=1)
 
         # # matplotlib colors ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
         self._curve_00 = None
@@ -106,6 +110,7 @@ class PrimaryPlotWidget(QWidget):
 
         self._init()
 
+    # TODO fix y data query
     def mouseMoved_00(self, evt):
         pos = evt[0]
         if self._plot_00.sceneBoundingRect().contains(pos):
@@ -117,7 +122,7 @@ class PrimaryPlotWidget(QWidget):
 
             index = int(mousePoint.x())
             if index > 0 and index < len(self._curve_00.yData):
-                self._label.setText(_label_text(mousePoint.x(), self._curve_00.yData[index]))
+                self._stat_label.setText(_label_text(mousePoint.x(), self._curve_00.yData[index]))
 
     def mouseMoved_01(self, evt):
         pos = evt[0]
@@ -130,7 +135,7 @@ class PrimaryPlotWidget(QWidget):
 
             index = int(mousePoint.x())
             if index > 0 and index < len(self._curve_01.yData):
-                self._label.setText(_label_text(mousePoint.x(), self._curve_01.yData[index]))
+                self._stat_label.setText(_label_text(mousePoint.x(), self._curve_01.yData[index]))
 
     def mouseMoved_10(self, evt):
         pos = evt[0]
@@ -143,7 +148,7 @@ class PrimaryPlotWidget(QWidget):
 
             index = int(mousePoint.x())
             if index > 0 and index < len(self._curve_10.yData):
-                self._label.setText(_label_text(mousePoint.x(), self._curve_10.yData[index]))
+                self._stat_label.setText(_label_text(mousePoint.x(), self._curve_10.yData[index]))
 
     def mouseMoved_11(self, evt):
         pos = evt[0]
@@ -156,7 +161,7 @@ class PrimaryPlotWidget(QWidget):
 
             index = int(mousePoint.x())
             if index > 0 and index < len(self._curve_11.yData):
-                self._label.setText(_label_text(mousePoint.x(), self._curve_11.yData[index]))
+                self._stat_label.setText(_label_text(mousePoint.x(), self._curve_11.yData[index]))
 
     def _init(self):
         pass
@@ -244,4 +249,4 @@ class PrimaryPlotWidget(QWidget):
 
 
 def _label_text(x, y):
-    return f"Mouse: <span style='font-size: 12pt'>x={x:5.2f},   <span style='color: #1f77b4'>y={y:5.2f}</span>"
+    return f"<span style='font-size: 12pt'>Mouse: x={x:5.2f},   y={y:5.2f}</span>"
