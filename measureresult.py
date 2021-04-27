@@ -37,10 +37,10 @@ class MeasureResult:
         p_loss = data['loss']
         phase = data['phase']
 
-        p_pch = 30 + 1 * log10(((ui/2 * 0.001) ** 2) / 100)
+        p_pch = 30 + 10 * log10(((ui/2) ** 2) / 100)
         kp_loss = p_pch - p_rf + p_loss
         a_err_times = uq / ui
-        a_err_db = 20 * (log10(uq * 0.001) - log10(ui * 0.001))
+        a_err_db = 20 * (log10(uq) - log10(ui))
         ph_err = phase + 90
         a_zk = 10 * log10((1 + a_err_times ** 2 - 2 * a_err_times * cos(radians(ph_err))) /
                           (1 + a_err_times ** 2 + 2 * a_err_times * cos(radians(ph_err))))
@@ -58,7 +58,7 @@ class MeasureResult:
             'f_tune': (data['f_rf'] - data['f_lo']) / MHz,
             'a_err': round((data['ch1_amp'] - data['ch2_amp']) * mV, 1),
             'p_pch': round(p_pch, 1),
-            'kp_loss': round(kp_loss, 1),
+            'kp_loss': round(kp_loss, 2),
             'a_err_times': round(a_err_times, 2),
             'a_err_db': abs(round(a_err_db, 2)),
             'ph_err': round(ph_err, 2),
@@ -100,7 +100,7 @@ class MeasureResult:
         αош, мВ={a_err}   Δφ, º={phase}
         
         Расчётные параметры:
-        Ппч, дБм={p_pch}   Кп, дБм={kp_loss}
+        Pпч, дБм={p_pch}   Кп, дБм={kp_loss}
         αош, раз={a_err_times}   αош, дБ={a_err_db}
         φош, º={ph_err}   αзк, дБ={a_zk}
         """.format(**self._report))
