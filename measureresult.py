@@ -75,6 +75,12 @@ class MeasureResult:
         self.headers.clear()
         self._raw.clear()
         self._report.clear()
+
+        self.data1.clear()
+        self.data2.clear()
+        self.data3.clear()
+        self.data4.clear()
+
         self.ready = False
 
     def set_secondary_params(self, params):
