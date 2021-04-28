@@ -42,12 +42,10 @@ class PrimaryPlotWidget(QWidget):
         self._plot_11 = self._win.addPlot(row=2, col=1)
         # self._plot_11.setTitle('αзк')
 
-        # # matplotlib colors ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
         self._curves_00 = dict()
-        self._curve_00 = None
-        self._curve_01 = None
-        self._curve_10 = None
-        self._curve_11 = None
+        self._curves_01 = dict()
+        self._curves_10 = dict()
+        self._curves_11 = dict()
 
         self._plot_00.setLabel('left', 'Кп', **self.label_style)
         self._plot_00.setLabel('bottom', 'Fгет, ГГц', **self.label_style)
@@ -204,66 +202,75 @@ class PrimaryPlotWidget(QWidget):
             else:
                 self._curves_00[pow_lo].setData(x=curve_xs, y=curve_ys)
 
-        # curve_00_xs, curve_00_ys = zip(*self._controller.result.data1)
-        # curve_01_xs, curve_01_ys = zip(*self._controller.result.data2)
-        # curve_10_xs, curve_10_ys = zip(*self._controller.result.data3)
-        # curve_11_xs, curve_11_ys = zip(*self._controller.result.data4)
-        #
-        # self._curve_00 = pg.PlotDataItem(
-        #     curve_00_xs,
-        #     curve_00_ys,
-        #     pen=pg.mkPen(
-        #         color='#1f77b4',
-        #         width=2,
-        #     ),
-        #     symbol='o',
-        #     symbolSize=5,
-        #     symbolBrush='#1f77b4',
-        #     name='Кп(fгет)'
-        # )
-        # self._plot_00.addItem(self._curve_00)
-        #
-        # self._curve_01 = pg.PlotDataItem(
-        #     curve_01_xs,
-        #     curve_01_ys,
-        #     pen=pg.mkPen(
-        #         color='#1f77b4',
-        #         width=2,
-        #     ),
-        #     symbol='o',
-        #     symbolSize=5,
-        #     symbolBrush='#1f77b4',
-        #     name='Кп(fгет)'
-        # )
-        # self._plot_01.addItem(self._curve_01)
-        #
-        # self._curve_10 = pg.PlotDataItem(
-        #     curve_10_xs,
-        #     curve_10_ys,
-        #     pen=pg.mkPen(
-        #         color='#1f77b4',
-        #         width=2,
-        #     ),
-        #     symbol='o',
-        #     symbolSize=5,
-        #     symbolBrush='#1f77b4',
-        #     name='поменять'
-        # )
-        # self._plot_10.addItem(self._curve_10)
-        #
-        # self._curve_11 = pg.PlotDataItem(
-        #     curve_11_xs,
-        #     curve_11_ys,
-        #     pen=pg.mkPen(
-        #         color='#1f77b4',
-        #         width=2,
-        #     ),
-        #     symbol='o',
-        #     symbolSize=5,
-        #     symbolBrush='#1f77b4',
-        #     name='поменять'
-        # )
-        # self._plot_11.addItem(self._curve_11)
+        for pow_lo, data in self._controller.result.data2.items():
+            curve_xs, curve_ys = zip(*data)
+            if pow_lo not in self._curves_01:
+                try:
+                    color = colors[len(self._curves_01)]
+                except IndexError:
+                    color = colors[len(self._curves_01) - len(colors)]
+                self._curves_01[pow_lo] = pg.PlotDataItem(
+                    curve_xs,
+                    curve_ys,
+                    pen=pg.mkPen(
+                        color=color,
+                        width=2,
+                    ),
+                    symbol='o',
+                    symbolSize=5,
+                    symbolBrush=color,
+                    name=f'{pow_lo} дБм'
+                )
+                self._plot_01.addItem(self._curves_01[pow_lo])
+            else:
+                self._curves_01[pow_lo].setData(x=curve_xs, y=curve_ys)
+
+        for pow_lo, data in self._controller.result.data3.items():
+            curve_xs, curve_ys = zip(*data)
+            if pow_lo not in self._curves_10:
+                try:
+                    color = colors[len(self._curves_10)]
+                except IndexError:
+                    color = colors[len(self._curves_10) - len(colors)]
+                self._curves_10[pow_lo] = pg.PlotDataItem(
+                    curve_xs,
+                    curve_ys,
+                    pen=pg.mkPen(
+                        color=color,
+                        width=2,
+                    ),
+                    symbol='o',
+                    symbolSize=5,
+                    symbolBrush=color,
+                    name=f'{pow_lo} дБм'
+                )
+                self._plot_10.addItem(self._curves_10[pow_lo])
+            else:
+                self._curves_10[pow_lo].setData(x=curve_xs, y=curve_ys)
+
+        for pow_lo, data in self._controller.result.data4.items():
+            curve_xs, curve_ys = zip(*data)
+            if pow_lo not in self._curves_11:
+                try:
+                    color = colors[len(self._curves_11)]
+                except IndexError:
+                    color = colors[len(self._curves_11) - len(colors)]
+                self._curves_11[pow_lo] = pg.PlotDataItem(
+                    curve_xs,
+                    curve_ys,
+                    pen=pg.mkPen(
+                        color=color,
+                        width=2,
+                    ),
+                    symbol='o',
+                    symbolSize=5,
+                    symbolBrush=color,
+                    name=f'{pow_lo} дБм'
+                )
+                self._plot_11.addItem(self._curves_11[pow_lo])
+            else:
+                self._curves_11[pow_lo].setData(x=curve_xs, y=curve_ys)
+
 
 def _label_text(x, y):
     return f"<span style='font-size: 12pt'>Mouse: x={x:5.2f},   y={y:5.2f}</span>"
