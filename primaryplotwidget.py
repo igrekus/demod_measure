@@ -177,9 +177,9 @@ class PrimaryPlotWidget(QWidget):
         self.clear()
         self._init()
 
-        tmp = list(self._controller.result.data1[-10])
-        tmp = [[x, y + 1] for x, y in tmp]
-        self._controller.result.data1[-5] = tmp
+        # tmp = list(self._controller.result.data1[-10])
+        # tmp = [[x, y + 1] for x, y in tmp]
+        # self._controller.result.data1[-5] = tmp
 
         for pow_lo, data in self._controller.result.data1.items():
             curve_xs, curve_ys = zip(*data)
