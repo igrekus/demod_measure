@@ -235,7 +235,6 @@ class InstrumentController(QObject):
                         rng = osc_ch1_amp + 0.3 * osc_ch1_amp
                         osc.send(f':CHANnel1:RANGe {rng}')
                         osc.send(f':CHANnel2:RANGe {rng}')
-                        # time.sleep(1)
 
                 p_lo_read = float(gen_lo.query('SOUR:POW?'))
                 f_lo_read = float(gen_lo.query('SOUR:FREQ?'))
