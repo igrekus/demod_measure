@@ -258,20 +258,6 @@ class InstrumentController(QObject):
                     'ch1_freq': osc_ch1_freq,
                     'loss': loss,
                 }
-                # to show:
-                # + p_lo, f_lo
-                # + p_rf, f_rf
-                # + u_src, i_src
-                # + ch1_amp. ch2_amp, ch2_amp - ch1_amp, phase, ch1_freq
-
-                # расчеты:
-                # + мощность сигнала пч по каналу 1: Ppch = 30 + 1 * log10(((ch1_amp/2 * 0.001) ^ 2) / 100)
-                # + к-т передачи с учетом потерь: Kp = Ppch - Prf + Pbal
-                # + амп. ошибка в разах: aerr_times = ch2_amp / chi1_amp
-                # + амп. ош в дБ: aerr_db = 20 * log10(ch2_amp * 0.001) - 20 * log10(ch1_amp * 0.001)
-                # + фаз. ош в град: pherr = delta_pherr + 90
-                # + подавление зерк. канала: azk = 10 * log10((1 + aerr_times ^ 2 - 2 * aerr_times * cos(rad(pherr)))
-                # / (1 + aerr_times ^ 2 + 2 * aerr_times * cos(rad(pherr))))
 
                 # if mock_enabled:
                 #     raw_point, stats = mocked_raw_data[index]
