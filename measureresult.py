@@ -93,20 +93,28 @@ class MeasureResult:
     @property
     def report(self):
         return dedent("""        Генераторы:
-        Pгет, дБм={p_lo}   Fгет, ГГц={f_lo:0.2f}
-        Pвх, дБм={p_rf}   Fвх, ГГц={f_rf:0.2f}
+        Pгет, дБм={p_lo}
+        Fгет, ГГц={f_lo:0.2f}
+        Pвх, дБм={p_rf}
+        Fвх, ГГц={f_rf:0.2f}
         Fпч, МГц={f_tune:0.2f}
         
         Источник питания:
-        U, В={u_src}   I, мА={i_src}
+        U, В={u_src}
+        I, мА={i_src}
 
         Осциллограф:
         F, ГГц={freq:0.3f}
-        UI, мВ={ui}   UQ, мВ={uq}
-        αош, мВ={a_err}   Δφ, º={phase}
+        UI, мВ={ui}
+        UQ, мВ={uq}
+        αош, мВ={a_err}
+        Δφ, º={phase}
         
         Расчётные параметры:
-        Pпч, дБм={p_pch}   Кп, дБм={kp_loss}
-        αош, раз={a_err_times}   αош, дБ={a_err_db}
-        φош, º={ph_err}   αзк, дБ={a_zk}
+        Pпч, дБм={p_pch}
+        Кп, дБм={kp_loss}
+        αош, раз={a_err_times}
+        αош, дБ={a_err_db}
+        φош, º={ph_err}
+        αзк, дБ={a_zk}
         """.format(**self._report))
