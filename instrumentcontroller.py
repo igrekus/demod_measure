@@ -115,7 +115,7 @@ class InstrumentController(QObject):
         sa = self._instruments['Анализатор']
 
         src_u = secondary['Usrc']
-        src_i = 200   # mA
+        src_i = 200  # mA
         pow_lo_start = secondary['Plo_min']
         pow_lo_end = secondary['Plo_max']
         pow_lo_step = secondary['Plo_delta']
@@ -139,9 +139,9 @@ class InstrumentController(QObject):
         osc.send(f':CHANnel1:DISPlay ON')
         osc.send(f':CHANnel2:DISPlay ON')
 
-        osc.send(':CHAN1:SCALE 0.05')   # V
+        osc.send(':CHAN1:SCALE 0.05')  # V
         osc.send(':CHAN2:SCALE 0.05')
-        osc.send(':TIMEBASE:SCALE 10E-8')   # ms / div
+        osc.send(':TIMEBASE:SCALE 10E-8')  # ms / div
 
         osc.send(':TRIGger:MODE EDGE')
         osc.send(':TRIGger:EDGE:SOURCe CHANnel1')
@@ -153,23 +153,43 @@ class InstrumentController(QObject):
         osc.send(':MEASure:PHASe CHANnel1,CHANnel2')
         osc.send(':MEASure:FREQuency CHANnel1')
 
-        pow_lo_values = [round(x, 3) for x in np.arange(start=pow_lo_start, stop=pow_lo_end + 0.2, step=pow_lo_step)]
-        freq_lo_values = [round(x, 3) for x in np.arange(start=freq_lo_start, stop=freq_lo_end + 0.2, step=freq_lo_step)]
-        freq_rf_values = [round(x, 3) for x in np.arange(start=freq_rf_start, stop=freq_rf_end + 0.2, step=freq_rf_step)]
+        pow_lo_values = [round(x, 3) for x in np.arange(start=pow_lo_start, stop=pow_lo_end + 0.2, step=pow_lo_step)] \
+            if pow_lo_start != pow_lo_end else [pow_lo_start]
+        freq_lo_values = [round(x, 3) for x in
+                          np.arange(start=freq_lo_start, stop=freq_lo_end + 0.0001, step=freq_lo_step)]
+        freq_rf_values = [round(x, 3) for x in
+                          np.arange(start=freq_rf_start, stop=freq_rf_end + 0.0001, step=freq_rf_step)]
 
         gen_rf.send(f'SOUR:POW {pow_rf}dbm')
 
-        if mock_enabled:
-            index = 0
-            with open('mock_data/meas_1_-10db.txt', mode='rt', encoding='utf-8') as f:
-                mocked_raw_data = ast.literal_eval(''.join(f.readlines()))
+        gen_lo.send(f':OUTP:MOD:STAT OFF')
+        gen_rf.send(f':OUTP:MOD:STAT OFF')
 
         res = []
         for pow_lo in pow_lo_values:
             gen_lo.send(f'SOUR:POW {pow_lo}dbm')
 
             for freq_lo, freq_rf in zip(freq_lo_values, freq_rf_values):
+                # turn off source and gens after measure and on cancel
+                # fix current measurement
+                # TODO add attenuation field -- calculate each pow point + att power
+                # use mean parameter for osc range calculation
+                # todo gen turn modulate off
+                # TODO clear plots
+
                 if token.cancelled:
+                    gen_lo.send(f'OUTP:STAT OFF')
+                    gen_rf.send(f'OUTP:STAT OFF')
+                    time.sleep(0.5)
+                    src.send('OUTPut OFF')
+
+                    gen_rf.send(f'SOUR:POW {pow_rf}dbm')
+                    gen_lo.send(f'SOUR:POW {pow_lo_start}dbm')
+
+                    gen_rf.send(f'SOUR:FREQ {freq_rf_start}GHz')
+                    gen_lo.send(f'SOUR:FREQ {freq_rf_start}GHz')
+                    gen_lo.send(f':OUTP:MOD:STAT ON')
+                    gen_rf.send(f':OUTP:MOD:STAT ON')
                     raise RuntimeError('measurement cancelled')
 
                 gen_lo.send(f'SOUR:FREQ {freq_lo}GHz')
@@ -183,30 +203,27 @@ class InstrumentController(QObject):
 
                 osc.send(':CDISplay')
 
-                # time.sleep(0.1)
-                # if not mock_enabled:
-                #     time.sleep(3)
+                time.sleep(2)
 
-                # label, current, result(-), min, max, mean, std dev, times
-                # TODO read mean instead of current
                 stats = osc.query(':MEASure:RESults?')
+                stats_split = stats.split(',')
 
-                osc_ch1_amp = float(osc.query(':MEASure:VAMPlitude? channel1'))
-                osc_ch2_amp = float(osc.query(':MEASure:VAMPlitude? channel2'))
-                osc_phase = float(osc.query(':MEASure:PHASe? CHANnel1,CHANnel2'))
-                osc_ch1_freq = float(osc.query(':MEASure:FREQuency? CHANnel1'))
+                osc_ch1_amp = float(stats_split[18])
+                osc_ch2_amp = float(stats_split[25])
+                osc_phase = float(stats_split[11])
+                osc_ch1_freq = float(stats_split[4])
 
                 timebase = (1 / (abs(freq_rf - freq_lo) * 10_000_000)) * 0.01
-                osc.send(f':TIMEBASE:SCALE {timebase}')   # ms / div
+                osc.send(f':TIMEBASE:SCALE {timebase}')  # ms / div
                 osc.send(f':CHANnel1:OFFSet 0')
                 osc.send(f':CHANnel2:OFFSet 0')
 
-                rng = osc_ch1_amp + 0.3 * osc_ch1_amp
-                osc.send(f':CHANnel1:RANGe {rng}')
-                osc.send(f':CHANnel2:RANGe {rng}')
-
-                if not mock_enabled:
-                    while rng > 1_000_000:
+                if osc_ch1_amp < 1_000_000 and osc_ch2_amp < 1_000_000:
+                    rng = osc_ch1_amp + 0.3 * osc_ch1_amp
+                    osc.send(f':CHANnel1:RANGe {rng}')
+                    osc.send(f':CHANnel2:RANGe {rng}')
+                else:
+                    while osc_ch1_amp > 1_000_000 or osc_ch2_amp > 1_000_000:
                         osc.send(f':CHANnel1:RANGe 0.2')
                         osc.send(f':CHANnel2:RANGe 0.2')
 
@@ -214,9 +231,11 @@ class InstrumentController(QObject):
 
                         time.sleep(2)
                         osc_ch1_amp = float(osc.query(':MEASure:VAMPlitude? channel1'))
+                        osc_ch2_amp = float(osc.query(':MEASure:VAMPlitude? channel2'))
                         rng = osc_ch1_amp + 0.3 * osc_ch1_amp
                         osc.send(f':CHANnel1:RANGe {rng}')
                         osc.send(f':CHANnel2:RANGe {rng}')
+                        # time.sleep(1)
 
                 p_lo_read = float(gen_lo.query('SOUR:POW?'))
                 f_lo_read = float(gen_lo.query('SOUR:FREQ?'))
@@ -224,15 +243,14 @@ class InstrumentController(QObject):
                 p_rf_read = float(gen_rf.query('SOUR:POW?'))
                 f_rf_read = float(gen_rf.query('SOUR:FREQ?'))
 
-                u_src_read = float(src.query('MEAS:VOLT?'))
-                i_src_read = float(src.query('MEAS:CURR?'))
+                i_src_read = float(mult.query('MEAS:CURR:DC? 1A,DEF'))
 
                 raw_point = {
                     'p_lo': p_lo_read,
                     'f_lo': f_lo_read,
                     'p_rf': p_rf_read,
                     'f_rf': f_rf_read,
-                    'u_src': u_src_read,
+                    'u_src': src_u,   # power source voltage
                     'i_src': i_src_read,
                     'ch1_amp': osc_ch1_amp,
                     'ch2_amp': osc_ch2_amp,
@@ -255,18 +273,30 @@ class InstrumentController(QObject):
                 # + подавление зерк. канала: azk = 10 * log10((1 + aerr_times ^ 2 - 2 * aerr_times * cos(rad(pherr)))
                 # / (1 + aerr_times ^ 2 + 2 * aerr_times * cos(rad(pherr))))
 
-                if mock_enabled:
-                    raw_point, stats = mocked_raw_data[index]
-                    index += 1
-                    raw_point['loss'] = loss
+                # if mock_enabled:
+                #     raw_point, stats = mocked_raw_data[index]
+                #     index += 1
+                #     raw_point['loss'] = loss
 
                 print(raw_point, stats)
                 self._add_measure_point(raw_point)
 
                 res.append([raw_point, stats])
 
-        # with open('out.txt', mode='wt', encoding='utf-8') as f:
-        #     f.send(str(res))
+        gen_lo.send(f'OUTP:STAT OFF')
+        gen_rf.send(f'OUTP:STAT OFF')
+        time.sleep(0.5)
+        src.send('OUTPut OFF')
+
+        gen_rf.send(f'SOUR:POW {pow_rf}dbm')
+        gen_lo.send(f'SOUR:POW {pow_lo_start}dbm')
+
+        gen_rf.send(f'SOUR:FREQ {freq_rf_start}GHz')
+        gen_lo.send(f'SOUR:FREQ {freq_rf_start}GHz')
+        gen_lo.send(f':OUTP:MOD:STAT ON')
+        gen_rf.send(f':OUTP:MOD:STAT ON')
+        with open('out.txt', mode='wt', encoding='utf-8') as f:
+            f.write(str(res))
 
         return res
 
