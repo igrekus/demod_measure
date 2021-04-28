@@ -1,4 +1,5 @@
 import random
+from collections import defaultdict
 
 from math import log10, cos, radians
 from textwrap import dedent
@@ -18,10 +19,10 @@ class MeasureResult:
         self._report = dict()
         self.ready = False
 
-        self.data1 = []
-        self.data2 = []
-        self.data3 = []
-        self.data4 = []
+        self.data1 = defaultdict(list)
+        self.data2 = defaultdict(list)
+        self.data3 = defaultdict(list)
+        self.data4 = defaultdict(list)
 
     def __bool__(self):
         return self.ready
@@ -31,6 +32,7 @@ class MeasureResult:
 
     def _process_point(self, data):
         f_lo = data['f_lo'] / GHz
+        p_lo = data['p_lo']
         ui = data['ch1_amp']
         uq = data['ch2_amp']
         p_rf = data['p_rf']
@@ -65,10 +67,10 @@ class MeasureResult:
             'a_zk': round(a_zk, 2),
         }
 
-        self.data1.append([f_lo, kp_loss])
-        self.data2.append([f_lo, a_err_db])
-        self.data3.append([f_lo, ph_err])
-        self.data4.append([f_lo, a_zk])
+        self.data1[p_lo].append([f_lo, kp_loss])
+        self.data2[p_lo].append([f_lo, a_err_db])
+        self.data3[p_lo].append([f_lo, ph_err])
+        self.data4[p_lo].append([f_lo, a_zk])
 
     def clear(self):
         self._secondaryParams.clear()
