@@ -112,57 +112,69 @@ class PrimaryPlotWidget(QWidget):
         self._init()
 
     # TODO fix y data query
-    def mouseMoved_00(self, evt):
-        pos = evt[0]
+    def mouseMoved_00(self, event):
+        pos = event[0]
         if self._plot_00.sceneBoundingRect().contains(pos):
-            mousePoint = self._vb_00.mapSceneToView(pos)
-            self._vLine_00.setPos(mousePoint.x())
-            self._hLine_00.setPos(mousePoint.y())
-            if not self._curve_00 or len(self._curve_00.yData) == 0:
+            mouse_point = self._vb_00.mapSceneToView(pos)
+            x = mouse_point.x()
+            y = mouse_point.y()
+            self._vLine_00.setPos(x)
+            self._hLine_00.setPos(y)
+            if not self._curves_00:
                 return
 
-            index = int(mousePoint.x())
-            if index > 0 and index < len(self._curve_00.yData):
-                self._stat_label.setText(_label_text(mousePoint.x(), self._curve_00.yData[index]))
+            self._stat_label.setText(_label_text(x, y, [
+                [p, curve.yData[_find_value_index(curve.xData, x)]]
+                for p, curve in self._curves_00.items()
+            ]))
 
-    def mouseMoved_01(self, evt):
-        pos = evt[0]
+    def mouseMoved_01(self, event):
+        pos = event[0]
         if self._plot_01.sceneBoundingRect().contains(pos):
-            mousePoint = self._vb_01.mapSceneToView(pos)
-            self._vLine_01.setPos(mousePoint.x())
-            self._hLine_01.setPos(mousePoint.y())
-            if not self._curve_01 or len(self._curve_01.yData) == 0:
+            mouse_point = self._vb_01.mapSceneToView(pos)
+            x = mouse_point.x()
+            y = mouse_point.y()
+            self._vLine_01.setPos(x)
+            self._hLine_01.setPos(y)
+            if not self._curves_01:
                 return
 
-            index = int(mousePoint.x())
-            if index > 0 and index < len(self._curve_01.yData):
-                self._stat_label.setText(_label_text(mousePoint.x(), self._curve_01.yData[index]))
+            self._stat_label.setText(_label_text(x, y, [
+                [p, curve.yData[_find_value_index(curve.xData, x)]]
+                for p, curve in self._curves_01.items()
+            ]))
 
-    def mouseMoved_10(self, evt):
-        pos = evt[0]
+    def mouseMoved_10(self, event):
+        pos = event[0]
         if self._plot_10.sceneBoundingRect().contains(pos):
-            mousePoint = self._vb_10.mapSceneToView(pos)
-            self._vLine_10.setPos(mousePoint.x())
-            self._hLine_10.setPos(mousePoint.y())
-            if not self._curve_10 or len(self._curve_10.yData) == 0:
+            mouse_point = self._vb_10.mapSceneToView(pos)
+            x = mouse_point.x()
+            y = mouse_point.y()
+            self._vLine_10.setPos(x)
+            self._hLine_10.setPos(y)
+            if not self._curves_10:
                 return
 
-            index = int(mousePoint.x())
-            if index > 0 and index < len(self._curve_10.yData):
-                self._stat_label.setText(_label_text(mousePoint.x(), self._curve_10.yData[index]))
+            self._stat_label.setText(_label_text(x, y, [
+                [p, curve.yData[_find_value_index(curve.xData, x)]]
+                for p, curve in self._curves_10.items()
+            ]))
 
-    def mouseMoved_11(self, evt):
-        pos = evt[0]
+    def mouseMoved_11(self, event):
+        pos = event[0]
         if self._plot_11.sceneBoundingRect().contains(pos):
-            mousePoint = self._vb_11.mapSceneToView(pos)
-            self._vLine_11.setPos(mousePoint.x())
-            self._hLine_11.setPos(mousePoint.y())
-            if not self._curve_11 or len(self._curve_11.yData) == 0:
+            mouse_point = self._vb_11.mapSceneToView(pos)
+            x = mouse_point.x()
+            y = mouse_point.y()
+            self._vLine_11.setPos(x)
+            self._hLine_11.setPos(y)
+            if not self._curves_11:
                 return
 
-            index = int(mousePoint.x())
-            if index > 0 and index < len(self._curve_11.yData):
-                self._stat_label.setText(_label_text(mousePoint.x(), self._curve_11.yData[index]))
+            self._stat_label.setText(_label_text(x, y, [
+                [p, curve.yData[_find_value_index(curve.xData, x)]]
+                for p, curve in self._curves_11.items()
+            ]))
 
     def _init(self):
         pass
@@ -206,5 +218,10 @@ def _plot_curves(datas, curves, plot):
             plot.addItem(curves[pow_lo])
 
 
-def _label_text(x, y):
-    return f"<span style='font-size: 12pt'>Mouse: x={x:5.2f},   y={y:5.2f}</span>"
+def _label_text(x, y, vals):
+    vals_str = ''.join(f'<br/><span style="color:{colors[i]}">{p:0.1f}={v:0.2f}</span>' for i, (p, v) in enumerate(vals))
+    return f"<span style='font-size: 12pt'>x={x:0.2f},   y={y:0.2f}   {vals_str}</span>"
+
+
+def _find_value_index(freqs: list, freq):
+    return min(range(len(freqs)), key=lambda i: abs(freqs[i] - freq))
