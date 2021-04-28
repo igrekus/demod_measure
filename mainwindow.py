@@ -109,7 +109,7 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def on_point_ready(self):
         self._ui.pteditProgress.setPlainText(self._instrumentController.result.report)
-        # self._plotWidget.plot()
+        self._plotWidget.plot()
 
     def closeEvent(self, _):
         self._measureWidget.cancel()
