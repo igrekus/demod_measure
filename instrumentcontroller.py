@@ -228,23 +228,24 @@ class InstrumentController(QObject):
                 osc.send(f':CHANnel1:OFFSet 0')
                 osc.send(f':CHANnel2:OFFSet 0')
 
-                if osc_ch1_amp < 1_000_000 and osc_ch2_amp < 1_000_000:
-                    rng = osc_ch1_amp + 0.3 * osc_ch1_amp
-                    osc.send(f':CHANnel1:RANGe {rng}')
-                    osc.send(f':CHANnel2:RANGe {rng}')
-                else:
-                    while osc_ch1_amp > 1_000_000 or osc_ch2_amp > 1_000_000:
-                        osc.send(f':CHANnel1:RANGe 0.2')
-                        osc.send(f':CHANnel2:RANGe 0.2')
-
-                        osc.send(':CDIS')
-
-                        time.sleep(2)
-                        osc_ch1_amp = float(osc.query(':MEASure:VAMPlitude? channel1'))
-                        osc_ch2_amp = float(osc.query(':MEASure:VAMPlitude? channel2'))
+                if not mock_enabled:
+                    if osc_ch1_amp < 1_000_000 and osc_ch2_amp < 1_000_000:
                         rng = osc_ch1_amp + 0.3 * osc_ch1_amp
                         osc.send(f':CHANnel1:RANGe {rng}')
                         osc.send(f':CHANnel2:RANGe {rng}')
+                    else:
+                        while osc_ch1_amp > 1_000_000 or osc_ch2_amp > 1_000_000:
+                            osc.send(f':CHANnel1:RANGe 0.2')
+                            osc.send(f':CHANnel2:RANGe 0.2')
+
+                            osc.send(':CDIS')
+
+                            time.sleep(2)
+                            osc_ch1_amp = float(osc.query(':MEASure:VAMPlitude? channel1'))
+                            osc_ch2_amp = float(osc.query(':MEASure:VAMPlitude? channel2'))
+                            rng = osc_ch1_amp + 0.3 * osc_ch1_amp
+                            osc.send(f':CHANnel1:RANGe {rng}')
+                            osc.send(f':CHANnel2:RANGe {rng}')
 
                 p_lo_read = float(gen_lo.query('SOUR:POW?'))
                 f_lo_read = float(gen_lo.query('SOUR:FREQ?'))
