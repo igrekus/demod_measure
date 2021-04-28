@@ -165,6 +165,11 @@ class InstrumentController(QObject):
         gen_lo.send(f':OUTP:MOD:STAT OFF')
         gen_rf.send(f':OUTP:MOD:STAT OFF')
 
+        if mock_enabled:
+            with open('./mock_data/meas_1_-10db.txt', mode='rt', encoding='utf-8') as f:
+                index = 0
+                mocked_raw_data = ast.literal_eval(''.join(f.readlines()))
+
         res = []
         for pow_lo in pow_lo_values:
             gen_lo.send(f'SOUR:POW {pow_lo}dbm')
@@ -203,11 +208,16 @@ class InstrumentController(QObject):
 
                 osc.send(':CDISplay')
 
-                time.sleep(2)
+                time.sleep(0.5)
+                if not mock_enabled:
+                    time.sleep(2)
 
-                stats = osc.query(':MEASure:RESults?')
+                if mock_enabled:
+                    _, stats = mocked_raw_data[index]
+                else:
+                    stats = osc.query(':MEASure:RESults?')
+
                 stats_split = stats.split(',')
-
                 osc_ch1_amp = float(stats_split[18])
                 osc_ch2_amp = float(stats_split[25])
                 osc_phase = float(stats_split[11])
@@ -258,10 +268,10 @@ class InstrumentController(QObject):
                     'loss': loss,
                 }
 
-                # if mock_enabled:
-                #     raw_point, stats = mocked_raw_data[index]
-                #     index += 1
-                #     raw_point['loss'] = loss
+                if mock_enabled:
+                    raw_point, stats = mocked_raw_data[index]
+                    raw_point['loss'] = loss
+                    index += 1
 
                 print(raw_point, stats)
                 self._add_measure_point(raw_point)
@@ -280,8 +290,10 @@ class InstrumentController(QObject):
         gen_lo.send(f'SOUR:FREQ {freq_rf_start}GHz')
         gen_lo.send(f':OUTP:MOD:STAT ON')
         gen_rf.send(f':OUTP:MOD:STAT ON')
-        with open('out.txt', mode='wt', encoding='utf-8') as f:
-            f.write(str(res))
+
+        if not mock_enabled:
+            with open('out.txt', mode='wt', encoding='utf-8') as f:
+                f.write(str(res))
 
         return res
 
