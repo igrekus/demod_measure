@@ -219,7 +219,7 @@ def _plot_curves(datas, curves, plot):
 
 
 def _label_text(x, y, vals):
-    vals_str = ''.join(f'<br/><span style="color:{colors[i]}">{p:0.1f}={v:0.2f}</span>' for i, (p, v) in enumerate(vals))
+    vals_str = ''.join(f'   <span style="color:{colors[i]}">{p:0.1f}={v:0.2f}</span>' for i, (p, v) in enumerate(vals))
     return f"<span style='font-size: 12pt'>x={x:0.2f},   y={y:0.2f}   {vals_str}</span>"
 
 
