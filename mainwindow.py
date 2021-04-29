@@ -115,3 +115,7 @@ class MainWindow(QMainWindow):
         self._measureWidget.cancel()
         while self._measureWidget._threads.activeThreadCount() > 0:
             time.sleep(0.1)
+
+    @pyqtSlot()
+    def on_btnExcel_clicked(self):
+        print('excel click')
