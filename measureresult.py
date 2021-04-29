@@ -1,7 +1,12 @@
-from collections import defaultdict
+import datetime
+import os.path
 
+from collections import defaultdict
 from math import log10, cos, radians
+from subprocess import Popen
 from textwrap import dedent
+
+import pandas as pd
 
 KHz = 1_000
 MHz = 1_000_000
@@ -16,6 +21,7 @@ class MeasureResult:
         self.headers = list()
         self._raw = list()
         self._report = dict()
+        self._processed = list()
         self.ready = False
 
         self.data1 = defaultdict(list)
@@ -70,12 +76,14 @@ class MeasureResult:
         self.data2[p_lo].append([f_lo, a_err_db])
         self.data3[p_lo].append([f_lo, ph_err])
         self.data4[p_lo].append([f_lo, a_zk])
+        self._processed.append({**self._report})
 
     def clear(self):
         self._secondaryParams.clear()
         self.headers.clear()
         self._raw.clear()
         self._report.clear()
+        self._processed.clear()
 
         self.data1.clear()
         self.data2.clear()
@@ -118,3 +126,27 @@ class MeasureResult:
         αош, дБ={a_err_db}
         φош, º={ph_err}
         αзк, дБ={a_zk}""".format(**self._report))
+
+    def export_excel(self):
+        device = 'demod'
+        path = 'xlsx'
+        if not os.path.isdir(f'{path}'):
+            os.makedirs(f'{path}')
+        file_name = f'./{path}/{device}-{datetime.datetime.now().isoformat().replace(":", ".")}.xlsx'
+        df = pd.DataFrame(self._processed)
+
+        df.columns = [
+            'Pгет, дБм', 'Fгет, ГГц',
+            'Pвх, дБм', 'Fвх, ГГц',
+            'Uпит, В', 'Iпит, мА',
+            'UI, мВ', 'UQ, мВ',
+            'Δφ, º', 'Fосц, ГГц',
+            'Fпч, МГц', 'αош, мВ',
+            'Pпч, дБм', 'Кп, дБм',
+            'αош, раз', 'αош, дБ',
+            'φош, º', 'αзк, дБ'
+        ]
+        df.to_excel(file_name, engine='openpyxl', index=False)
+
+        full_path = os.path.abspath(file_name)
+        Popen(f'explorer /select,"{full_path}"')

@@ -118,4 +118,4 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def on_btnExcel_clicked(self):
-        print('excel click')
+        self._instrumentController.result.export_excel()
