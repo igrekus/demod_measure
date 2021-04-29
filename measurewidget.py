@@ -306,8 +306,8 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         return res
 
     def cancel(self):
-        print('cancelling task')
         if not self._token.cancelled:
+            print('cancelling task')
             self._token.cancelled = True
 
     def on_params_changed(self, value):
