@@ -26,7 +26,6 @@ class InstrumentController(QObject):
             'P RF': GeneratorFactory('GPIB1::20::INSTR'),
             'Источник': SourceFactory('GPIB1::3::INSTR'),
             'Мультиметр': MultimeterFactory('GPIB1::22::INSTR'),
-            # 'Анализатор': AnalyzerFactory('GPIB1::18::INSTR'),
         }
 
         self.deviceParams = {
