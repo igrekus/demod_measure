@@ -7,7 +7,6 @@ from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 from formlayout.formlayout import fedit
 from instrumentcontroller import InstrumentController
 from connectionwidget import ConnectionWidget
-from measuremodel import MeasureModel
 from measurewidget import MeasureWidgetWithSecondaryParameters
 from primaryplotwidget import PrimaryPlotWidget
 
@@ -29,7 +28,6 @@ class MainWindow(QMainWindow):
         self._instrumentController = InstrumentController(parent=self)
         self._connectionWidget = ConnectionWidget(parent=self, controller=self._instrumentController)
         self._measureWidget = MeasureWidgetWithSecondaryParameters(parent=self, controller=self._instrumentController)
-        self._measureModel = MeasureModel(parent=self, controller=self._instrumentController)
         self._plotWidget = PrimaryPlotWidget(parent=self, controller=self._instrumentController)
 
         # init UI
@@ -47,30 +45,12 @@ class MainWindow(QMainWindow):
         self._measureWidget.secondaryChanged.connect(self._instrumentController.on_secondary_changed)
 
         self._measureWidget.measureStarted.connect(self.on_measureStarted)
-        self._measureWidget.measureComplete.connect(self._measureModel.update)
         self._measureWidget.measureComplete.connect(self.on_measureComplete)
 
         self._instrumentController.pointReady.connect(self.on_point_ready)
 
-        # self._ui.tableMeasure.setModel(self._measureModel)
-
-        self.refreshView()
-
         self._measureWidget.updateWidgets(self._instrumentController.secondaryParams)
         self._measureWidget.on_params_changed(1)
-
-    # UI utility methods
-    def refreshView(self):
-        self.resizeTable()
-
-    def resizeTable(self):
-        pass
-        # self._ui.tableMeasure.resizeRowsToContents()
-        # self._ui.tableMeasure.resizeColumnsToContents()
-
-    # event handlers
-    def resizeEvent(self, event):
-        self.refreshView()
 
     @pyqtSlot()
     def on_instrumens_connected(self):

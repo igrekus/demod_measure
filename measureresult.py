@@ -18,7 +18,6 @@ mV = 1_000
 class MeasureResult:
     def __init__(self):
         self._secondaryParams = None
-        self.headers = list()
         self._raw = list()
         self._report = dict()
         self._processed = list()
@@ -81,7 +80,6 @@ class MeasureResult:
 
     def clear(self):
         self._secondaryParams.clear()
-        self.headers.clear()
         self._raw.clear()
         self._report.clear()
         self._processed.clear()
