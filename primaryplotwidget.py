@@ -53,7 +53,7 @@ class PrimaryPlotWidget(QWidget):
         # self._plot_00.setYRange(20, 55, padding=0)
         self._plot_00.enableAutoRange('x')
         self._plot_00.enableAutoRange('y')
-        self._plot_00.addLegend(offset=(400, 300))
+        self._plot_00.addLegend(offset=(30, 300))
         self._plot_00.showGrid(x=True, y=True)
         self._vb_00 = self._plot_00.vb
         self._vLine_00 = pg.InfiniteLine(angle=90, movable=False)
@@ -68,7 +68,7 @@ class PrimaryPlotWidget(QWidget):
         # self._plot_01.setYRange(20, 55, padding=0)
         self._plot_01.enableAutoRange('x')
         self._plot_01.enableAutoRange('y')
-        self._plot_01.addLegend(offset=(500, 300))
+        self._plot_01.addLegend(offset=(30, 300))
         self._plot_01.showGrid(x=True, y=True)
         self._vb_01 = self._plot_01.vb
         self._vLine_01 = pg.InfiniteLine(angle=90, movable=False)
@@ -83,7 +83,7 @@ class PrimaryPlotWidget(QWidget):
         # self._plot_10.setYRange(20, 55, padding=0)
         self._plot_10.enableAutoRange('x')
         self._plot_10.enableAutoRange('y')
-        self._plot_10.addLegend(offset=(400, 30))
+        self._plot_10.addLegend(offset=(30, 30))
         self._plot_10.showGrid(x=True, y=True)
         self._vb_10 = self._plot_10.vb
         self._vLine_10 = pg.InfiniteLine(angle=90, movable=False)
@@ -98,7 +98,7 @@ class PrimaryPlotWidget(QWidget):
         # self._plot_11.setYRange(20, 55, padding=0)
         self._plot_11.enableAutoRange('x')
         self._plot_11.enableAutoRange('y')
-        self._plot_11.addLegend(offset=(500, 30))
+        self._plot_11.addLegend(offset=(30, 30))
         self._plot_11.showGrid(x=True, y=True)
         self._vb_11 = self._plot_11.vb
         self._vLine_11 = pg.InfiniteLine(angle=90, movable=False)
