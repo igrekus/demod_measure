@@ -29,6 +29,17 @@ class InstrumentController(QObject):
             'Мультиметр': MultimeterFactory('GPIB1::22::INSTR'),
         }
 
+        if isfile('./instr.ini'):
+            with open('./instr.ini', mode='rt', encoding='utf-8') as f:
+                addrs = ast.literal_eval(''.join(f.readlines()))
+                self.requiredInstruments = {
+                    'Осциллограф': OscilloscopeFactory(addrs['Осциллограф']),
+                    'P LO': GeneratorFactory(addrs['P LO']),
+                    'P RF': GeneratorFactory(addrs['P RF']),
+                    'Источник': SourceFactory(addrs['Источник']),
+                    'Мультиметр': MultimeterFactory(addrs['Мультиметр']),
+                }
+
         self.deviceParams = {
             'Демодулятор': {
                 'F': 1,
