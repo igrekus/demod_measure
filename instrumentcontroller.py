@@ -206,7 +206,7 @@ class InstrumentController(QObject):
 
                 osc.send(':CDISplay')
 
-                time.sleep(0.5)
+                # time.sleep(0.5)
                 if not mock_enabled:
                     time.sleep(2)
 
