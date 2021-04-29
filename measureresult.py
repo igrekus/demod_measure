@@ -118,5 +118,4 @@ class MeasureResult:
         αош, раз={a_err_times}
         αош, дБ={a_err_db}
         φош, º={ph_err}
-        αзк, дБ={a_zk}
-        """.format(**self._report))
+        αзк, дБ={a_zk}""".format(**self._report))
