@@ -1,5 +1,5 @@
-from PyQt6.QtCore import pyqtSignal, pyqtSlot
-from PyQt6.QtWidgets import QWidget, QComboBox, QFormLayout
+from PyQt5.QtCore import pyqtSignal, pyqtSlot
+from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout
 
 
 class DeviceSelectWidget(QWidget):

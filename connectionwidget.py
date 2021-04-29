@@ -1,6 +1,6 @@
-from PyQt6 import uic
-from PyQt6.QtCore import pyqtSlot, pyqtSignal, QRunnable, QThreadPool
-from PyQt6.QtWidgets import QWidget
+from PyQt5 import uic
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QRunnable, QThreadPool
+from PyQt5.QtWidgets import QWidget
 
 from instrumentwidget import InstrumentWidget
 

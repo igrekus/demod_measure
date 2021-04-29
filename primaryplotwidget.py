@@ -1,7 +1,7 @@
 import pyqtgraph as pg
 
-from PyQt6.QtWidgets import QGridLayout, QWidget, QLabel
-from PyQt6.QtCore import Qt
+from PyQt5.QtWidgets import QGridLayout, QWidget, QLabel
+from PyQt5.QtCore import Qt
 
 
 # https://www.learnpyqt.com/tutorials/plotting-pyqtgraph/
@@ -25,7 +25,7 @@ class PrimaryPlotWidget(QWidget):
         self._win.setBackground('w')
 
         self._stat_label = QLabel('Mouse position:')
-        self._stat_label.setAlignment(Qt.Alignment.AlignRight)
+        self._stat_label.setAlignment(Qt.AlignRight)
 
         self._grid.addWidget(self._stat_label, 0, 0)
         self._grid.addWidget(self._win, 1, 0)

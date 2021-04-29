@@ -1,8 +1,8 @@
 import time
 
-from PyQt6 import uic
-from PyQt6.QtWidgets import QMainWindow
-from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot
+from PyQt5 import uic
+from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 
 from formlayout.formlayout import fedit
 from instrumentcontroller import InstrumentController
@@ -21,8 +21,8 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.setAttribute(Qt.WidgetAttribute.WA_QuitOnClose)
-        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+        self.setAttribute(Qt.WA_QuitOnClose)
+        self.setAttribute(Qt.WA_DeleteOnClose)
 
         # create instance variables
         self._ui = uic.loadUi('mainwindow.ui', self)
