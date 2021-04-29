@@ -11,8 +11,6 @@ from instr.instrumentfactory import mock_enabled, OscilloscopeFactory, Generator
 from measureresult import MeasureResult
 
 
-# TODO legend: move all to left-bottom
-# TODO report label -- align innto single line
 # TODO calibration
 # TODO add attenuation field -- calculate each pow point + att power
 
