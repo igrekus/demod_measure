@@ -138,6 +138,9 @@ class MeasureWidget(QWidget):
         self._ui.btnCancel.setEnabled(True)
         self._devices.enabled = False
 
+    def updateWidgets(self, params):
+        raise NotImplementedError
+
 
 class MeasureWidgetWithSecondaryParameters(MeasureWidget):
     secondaryChanged = pyqtSignal(dict)
@@ -332,3 +335,18 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
             'Loss': self._spinLoss.value(),
         }
         self.secondaryChanged.emit(params)
+
+    def updateWidgets(self, params):
+        self._spinPloMin.setValue(params['Plo_min'])
+        self._spinPloMax.setValue(params['Plo_max'])
+        self._spinPloDelta.setValue(params['Plo_delta'])
+        self._spinFloMin.setValue(params['Flo_min'])
+        self._spinFloMax.setValue(params['Flo_max'])
+        self._spinFloDelta.setValue(params['Flo_delta'])
+        self._spinPrf.setValue(params['Prf'])
+        self._spinFrfMin.setValue(params['Frf_min'])
+        self._spinFrfMax.setValue(params['Frf_max'])
+        self._spinFrfDelta.setValue(params['Frf_delta'])
+        self._spinUsrc.setValue(params['Usrc'])
+        self._checkOscAvg.setChecked(params['OscAvg'])
+        self._spinLoss.setValue(params['Loss'])

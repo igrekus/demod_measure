@@ -56,6 +56,7 @@ class MainWindow(QMainWindow):
 
         self.refreshView()
 
+        self._measureWidget.updateWidgets(self._instrumentController.secondaryParams)
         self._measureWidget.on_params_changed(1)
 
     # UI utility methods
@@ -112,6 +113,7 @@ class MainWindow(QMainWindow):
         self._plotWidget.plot()
 
     def closeEvent(self, _):
+        self._instrumentController.saveConfigs()
         self._measureWidget.cancel()
         while self._measureWidget._threads.activeThreadCount() > 0:
             time.sleep(0.1)

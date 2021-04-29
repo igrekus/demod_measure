@@ -3,6 +3,7 @@ import time
 
 import numpy as np
 
+from pprint import pprint
 from os.path import isfile
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
@@ -34,13 +35,25 @@ class InstrumentController(QObject):
             },
         }
 
-        if isfile('./params.ini'):
-            import ast
-            with open('./params.ini', 'rt', encoding='utf-8') as f:
-                raw = ''.join(f.readlines())
-                self.deviceParams = ast.literal_eval(raw)
+        self.secondaryParams = {
+            'Plo_min': -10.0,
+            'Plo_max': -10.0,
+            'Plo_delta': 1.0,
+            'Flo_min': 0.1,
+            'Flo_max': 3.0,
+            'Flo_delta': 0.1,
+            'Prf': -10.0,
+            'Frf_min': 0.11,
+            'Frf_max': 3.1,
+            'Frf_delta': 0.1,
+            'Usrc': 5.0,
+            'OscAvg': True,
+            'Loss': 0.82,
+        }
 
-        self.secondaryParams = {}
+        if isfile('./params.ini'):
+            with open('./params.ini', 'rt', encoding='utf-8') as f:
+                self.secondaryParams = ast.literal_eval(''.join(f.readlines()))
 
         self._instruments = dict()
         self.found = False
@@ -297,6 +310,11 @@ class InstrumentController(QObject):
         print('measured point:', data)
         self.result.add_point(data)
         self.pointReady.emit()
+
+    def saveConfigs(self):
+        if isfile('./params.ini'):
+            with open('./params.ini', 'wt', encoding='utf-8') as f:
+                pprint(self.secondaryParams, stream=f)
 
     @pyqtSlot(dict)
     def on_secondary_changed(self, params):
