@@ -12,6 +12,11 @@ from instr.instrumentfactory import mock_enabled, OscilloscopeFactory, Generator
 from measureresult import MeasureResult
 
 
+# TODO legend: move all to left-bottom
+# TODO report label -- align innto single line
+# TODO calibration
+# TODO add attenuation field -- calculate each pow point + att power
+
 class InstrumentController(QObject):
     pointReady = pyqtSignal()
 
@@ -175,12 +180,6 @@ class InstrumentController(QObject):
             gen_lo.send(f'SOUR:POW {pow_lo}dbm')
 
             for freq_lo, freq_rf in zip(freq_lo_values, freq_rf_values):
-                # turn off source and gens after measure and on cancel
-                # fix current measurement
-                # TODO add attenuation field -- calculate each pow point + att power
-                # use mean parameter for osc range calculation
-                # todo gen turn modulate off
-                # TODO clear plots
 
                 if token.cancelled:
                     gen_lo.send(f'OUTP:STAT OFF')
