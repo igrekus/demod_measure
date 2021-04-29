@@ -24,7 +24,7 @@ class InstrumentController(QObject):
             'P RF': GeneratorFactory('GPIB1::20::INSTR'),
             'Источник': SourceFactory('GPIB1::3::INSTR'),
             'Мультиметр': MultimeterFactory('GPIB1::22::INSTR'),
-            'Анализатор': AnalyzerFactory('GPIB1::18::INSTR'),
+            # 'Анализатор': AnalyzerFactory('GPIB1::18::INSTR'),
         }
 
         self.deviceParams = {
@@ -104,7 +104,7 @@ class InstrumentController(QObject):
         self._instruments['Осциллограф'].send('*RST')
         self._instruments['Источник'].send('*RST')
         self._instruments['Мультиметр'].send('*RST')
-        self._instruments['Анализатор'].send('*RST')
+        # self._instruments['Анализатор'].send('*RST')
 
     def _measure_s_params(self, token, param, secondary):
         gen_lo = self._instruments['P LO']
@@ -112,7 +112,7 @@ class InstrumentController(QObject):
         osc = self._instruments['Осциллограф']
         src = self._instruments['Источник']
         mult = self._instruments['Мультиметр']
-        sa = self._instruments['Анализатор']
+        # sa = self._instruments['Анализатор']
 
         src_u = secondary['Usrc']
         src_i = 200  # mA
