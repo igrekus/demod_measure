@@ -238,7 +238,7 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._devices._layout.addRow('Uпит.=', self._spinUsrc)
 
         self._checkOscAvg = QCheckBox(parent=self)
-        self._checkOscAvg.setChecked(False)
+        self._checkOscAvg.setChecked(True)
         self._devices._layout.addRow('Avg on/off', self._checkOscAvg)
 
         self._spinLoss = QDoubleSpinBox(parent=self)
