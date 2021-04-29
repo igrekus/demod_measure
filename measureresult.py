@@ -70,6 +70,7 @@ class MeasureResult:
             'a_err_db': abs(round(a_err_db, 2)),
             'ph_err': round(ph_err, 2),
             'a_zk': round(a_zk, 2),
+            'loss': data['loss'],
         }
 
         self.data1[p_lo].append([f_lo, kp_loss])
@@ -144,7 +145,8 @@ class MeasureResult:
             'Fпч, МГц', 'αош, мВ',
             'Pпч, дБм', 'Кп, дБм',
             'αош, раз', 'αош, дБ',
-            'φош, º', 'αзк, дБ'
+            'φош, º', 'αзк, дБ',
+            'Потери, дБ',
         ]
         df.to_excel(file_name, engine='openpyxl', index=False)
 
