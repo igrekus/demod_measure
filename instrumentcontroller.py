@@ -59,7 +59,7 @@ class InstrumentController(QObject):
             'Frf_delta': 0.1,
             'Usrc': 5.0,
             'OscAvg': True,
-            'Loss': 0.82,
+            'loss': 0.82,
         }
 
         if isfile('./params.ini'):
@@ -153,7 +153,7 @@ class InstrumentController(QObject):
         freq_rf_end = secondary['Frf_max']
         freq_rf_step = secondary['Frf_delta']
 
-        loss = secondary['Loss']
+        loss = secondary['loss']
 
         osc_avg = 'ON' if secondary['OscAvg'] else 'OFF'
 

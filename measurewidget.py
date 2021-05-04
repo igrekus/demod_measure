@@ -332,7 +332,7 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
 
             'OscAvg': self._checkOscAvg.isChecked(),
 
-            'Loss': self._spinLoss.value(),
+            'loss': self._spinLoss.value(),
         }
         self.secondaryChanged.emit(params)
 
@@ -349,4 +349,4 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinFrfDelta.setValue(params['Frf_delta'])
         self._spinUsrc.setValue(params['Usrc'])
         self._checkOscAvg.setChecked(params['OscAvg'])
-        self._spinLoss.setValue(params['Loss'])
+        self._spinLoss.setValue(params['loss'])
