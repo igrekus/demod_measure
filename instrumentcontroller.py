@@ -106,7 +106,7 @@ class InstrumentController(QObject):
             self.result.set_secondary_params(self.secondaryParams)
             self._measure(token, device)
             # self.hasResult = bool(self.result)
-            self.hasResult = True   # HACK
+            self.hasResult = True  # HACK
         except RuntimeError as ex:
             print('runtime error:', ex)
 
@@ -329,9 +329,8 @@ class InstrumentController(QObject):
         self.pointReady.emit()
 
     def saveConfigs(self):
-        if isfile('./params.ini'):
-            with open('./params.ini', 'wt', encoding='utf-8') as f:
-                pprint(self.secondaryParams, stream=f)
+        with open('./params.ini', 'wt', encoding='utf-8') as f:
+            pprint(self.secondaryParams, stream=f)
 
     @pyqtSlot(dict)
     def on_secondary_changed(self, params):
@@ -344,4 +343,3 @@ class InstrumentController(QObject):
 
 def parse_float_list(lst):
     return [float(x) for x in lst.split(',')]
-
