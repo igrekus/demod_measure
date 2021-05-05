@@ -248,11 +248,17 @@ class InstrumentController(QObject):
                 osc.send(f':CHANnel2:OFFSet 0')
 
                 if not mock_enabled:
+                    # second measure point goes out of OSC display range resulting in incorrect measurement
+                    # this is correct device under measurement behaviour, not a bug
                     if osc_ch1_amp < 1_000_000 and osc_ch2_amp < 1_000_000:
+                        # if reading is correct, scale OSC display as usual
                         rng = osc_ch1_amp + 0.3 * osc_ch1_amp
                         osc.send(f':CHANnel1:RANGe {rng}')
                         osc.send(f':CHANnel2:RANGe {rng}')
                     else:
+                        # if not, reset OSC display range to guaranteed safe level
+                        # and iterate OSC range scaling a few times
+                        # to get the correct reading
                         while osc_ch1_amp > 1_000_000 or osc_ch2_amp > 1_000_000:
                             osc.send(f':CHANnel1:RANGe 0.2')
                             osc.send(f':CHANnel2:RANGe 0.2')
