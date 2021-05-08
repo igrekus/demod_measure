@@ -109,8 +109,6 @@ class PrimaryPlotWidget(QWidget):
 
         self.setLayout(self._grid)
 
-        self._init()
-
     # TODO fix y data query
     def mouseMoved_00(self, event):
         pos = event[0]
