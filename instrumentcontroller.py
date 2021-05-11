@@ -178,7 +178,10 @@ class InstrumentController(QObject):
         osc.send(':MEASure:PHASe CHANnel1,CHANnel2')
         osc.send(':MEASure:FREQuency CHANnel1')
 
-        pow_lo_values = [round(x, 3) for x in np.arange(start=pow_lo_start, stop=pow_lo_end + 0.2, step=pow_lo_step)] \
+        # pow_lo_end = -5.0
+        # pow_lo_step = 5
+
+        pow_lo_values = [round(x, 3) for x in np.arange(start=pow_lo_start, stop=pow_lo_end + 0.002, step=pow_lo_step)] \
             if pow_lo_start != pow_lo_end else [pow_lo_start]
         freq_lo_values = [round(x, 3) for x in
                           np.arange(start=freq_lo_start, stop=freq_lo_end + 0.0001, step=freq_lo_step)]
@@ -191,6 +194,7 @@ class InstrumentController(QObject):
         # gen_rf.send(f':OUTP:MOD:STAT OFF')
 
         if mock_enabled:
+            # with open('./mock_data/meas_1_-10-5db.txt', mode='rt', encoding='utf-8') as f:
             with open('./mock_data/meas_1_-10db.txt', mode='rt', encoding='utf-8') as f:
                 index = 0
                 mocked_raw_data = ast.literal_eval(''.join(f.readlines()))
