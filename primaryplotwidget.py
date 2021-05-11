@@ -174,17 +174,23 @@ class PrimaryPlotWidget(QWidget):
                 for p, curve in self._curves_11.items()
             ]))
 
-    def _init(self):
-        pass
-
     def clear(self):
-        pass
+        def _remove_curves(plot, curve_dict):
+            for _, curve in curve_dict.items():
+                plot.removeItem(curve)
+
+        _remove_curves(self._plot_00, self._curves_00)
+        _remove_curves(self._plot_01, self._curves_01)
+        _remove_curves(self._plot_10, self._curves_10)
+        _remove_curves(self._plot_11, self._curves_11)
+
+        self._curves_00.clear()
+        self._curves_01.clear()
+        self._curves_10.clear()
+        self._curves_11.clear()
 
     def plot(self):
         print('plotting primary stats')
-        self.clear()
-        self._init()
-
         _plot_curves(self._controller.result.data1, self._curves_00, self._plot_00)
         _plot_curves(self._controller.result.data2, self._curves_01, self._plot_01)
         _plot_curves(self._controller.result.data3, self._curves_10, self._plot_10)
