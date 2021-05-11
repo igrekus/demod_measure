@@ -188,7 +188,7 @@ class InstrumentController(QObject):
         gen_rf.send(f'SOUR:POW {pow_rf}dbm')
 
         gen_lo.send(f':OUTP:MOD:STAT OFF')
-        gen_rf.send(f':OUTP:MOD:STAT OFF')
+        # gen_rf.send(f':OUTP:MOD:STAT OFF')
 
         if mock_enabled:
             with open('./mock_data/meas_1_-10db.txt', mode='rt', encoding='utf-8') as f:
