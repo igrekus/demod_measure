@@ -99,6 +99,18 @@ class InstrumentController(QObject):
         print(f'launch check with {self.deviceParams[device]} {self.secondaryParams}')
         return True
 
+    def calibrate(self, token, params):
+        print(f'call calibrate with {token} {params}')
+        return self._calibrate(token, self.secondaryParams)
+
+    def _calibrate(self, token, secondary):
+        print('run calibrate with', secondary)
+        for _ in range(10):
+            if token.cancelled:
+                return False
+            time.sleep(0.5)
+        return True
+
     def measure(self, token, params):
         print(f'call measure with {token} {params}')
         device, _ = params

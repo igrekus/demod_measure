@@ -31,6 +31,7 @@ class MeasureWidget(QWidget):
     sampleFound = pyqtSignal()
     measureComplete = pyqtSignal()
     measureStarted = pyqtSignal()
+    calibrateFinished = pyqtSignal()
 
     def __init__(self, parent=None, controller=None):
         super().__init__(parent=parent)
@@ -64,6 +65,12 @@ class MeasureWidget(QWidget):
         self.sampleFound.emit()
         return True
 
+    def calibrate(self):
+        raise NotImplementedError
+
+    def calibrateTaskComplete(self):
+        raise NotImplementedError
+
     def measure(self):
         print('measuring...')
         self._modeDuringMeasure()
@@ -93,6 +100,11 @@ class MeasureWidget(QWidget):
         self.check()
 
     @pyqtSlot()
+    def on_btnCalibrate_clicked(self):
+        print('start calibration')
+        self.calibrate()
+
+    @pyqtSlot()
     def on_btnMeasure_clicked(self):
         print('start measure')
         self.measureStarted.emit()
@@ -112,30 +124,35 @@ class MeasureWidget(QWidget):
         self._ui.btnCheck.setEnabled(False)
         self._ui.btnMeasure.setEnabled(False)
         self._ui.btnCancel.setEnabled(False)
+        self._ui.btnCalibrate.setEnabled(False)
         self._devices.enabled = True
 
     def _modePreCheck(self):
         self._ui.btnCheck.setEnabled(True)
         self._ui.btnMeasure.setEnabled(False)
         self._ui.btnCancel.setEnabled(False)
+        self._ui.btnCalibrate.setEnabled(False)
         self._devices.enabled = True
 
     def _modeDuringCheck(self):
         self._ui.btnCheck.setEnabled(False)
         self._ui.btnMeasure.setEnabled(False)
         self._ui.btnCancel.setEnabled(False)
+        self._ui.btnCalibrate.setEnabled(False)
         self._devices.enabled = False
 
     def _modePreMeasure(self):
         self._ui.btnCheck.setEnabled(False)
         self._ui.btnMeasure.setEnabled(True)
         self._ui.btnCancel.setEnabled(False)
+        self._ui.btnCalibrate.setEnabled(True)
         self._devices.enabled = False
 
     def _modeDuringMeasure(self):
         self._ui.btnCheck.setEnabled(False)
         self._ui.btnMeasure.setEnabled(False)
         self._ui.btnCancel.setEnabled(True)
+        self._ui.btnCalibrate.setEnabled(True)
         self._devices.enabled = False
 
     def updateWidgets(self, params):
@@ -289,6 +306,22 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         if not res:
             self._token = CancelToken()
         return res
+
+    def calibrate(self):
+        print('calibrating...')
+        self._modeDuringMeasure()
+        self._threads.start(
+            MeasureTask(
+                self._controller.calibrate,
+                self.calibrateTaskComplete,
+                self._token,
+                [self._selectedDevice, self._params]
+            ))
+
+    def calibrateTaskComplete(self):
+        print('calibrate finished')
+        self._modePreMeasure()
+        self.calibrateFinished.emit()
 
     def measure(self):
         print('subclass measuring...')
