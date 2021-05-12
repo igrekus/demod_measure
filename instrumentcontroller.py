@@ -262,8 +262,8 @@ class InstrumentController(QObject):
                         # and iterate OSC range scaling a few times
                         # to get the correct reading
                         while osc_ch1_amp > 1_000_000 or osc_ch2_amp > 1_000_000:
-                            osc.send(f':CHANnel1:RANGe 0.2')
-                            osc.send(f':CHANnel2:RANGe 0.2')
+                            osc.send(f':CHANnel1:RANGe 0.7')
+                            osc.send(f':CHANnel2:RANGe 0.7')
 
                             osc.send(':CDIS')
 
