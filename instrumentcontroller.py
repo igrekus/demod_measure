@@ -8,7 +8,7 @@ from os.path import isfile
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
 from instr.instrumentfactory import mock_enabled, OscilloscopeFactory, GeneratorFactory, SourceFactory, \
-    MultimeterFactory
+    MultimeterFactory, AnalyzerFactory
 from measureresult import MeasureResult
 
 
@@ -23,6 +23,7 @@ class InstrumentController(QObject):
 
         self.requiredInstruments = {
             'Осциллограф': OscilloscopeFactory('GPIB1::7::INSTR'),
+            'Анализатор': OscilloscopeFactory('GPIB1::18::INSTR'),
             'P LO': GeneratorFactory('GPIB1::6::INSTR'),
             'P RF': GeneratorFactory('GPIB1::20::INSTR'),
             'Источник': SourceFactory('GPIB1::3::INSTR'),
@@ -34,6 +35,7 @@ class InstrumentController(QObject):
                 addrs = ast.literal_eval(''.join(f.readlines()))
                 self.requiredInstruments = {
                     'Осциллограф': OscilloscopeFactory(addrs['Осциллограф']),
+                    'Анализатор': AnalyzerFactory(addrs['Анализатор']),
                     'P LO': GeneratorFactory(addrs['P LO']),
                     'P RF': GeneratorFactory(addrs['P RF']),
                     'Источник': SourceFactory(addrs['Источник']),
@@ -105,6 +107,14 @@ class InstrumentController(QObject):
 
     def _calibrate(self, token, secondary):
         print('run calibrate with', secondary)
+        self._init()
+
+
+
+        gen_lo = self._instruments['P LO']
+        gen_rf = self._instruments['P RF']
+        sa = self._instruments['Анализатор']
+
         for _ in range(10):
             if token.cancelled:
                 return False
