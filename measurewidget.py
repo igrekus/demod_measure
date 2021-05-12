@@ -152,7 +152,7 @@ class MeasureWidget(QWidget):
         self._ui.btnCheck.setEnabled(False)
         self._ui.btnMeasure.setEnabled(False)
         self._ui.btnCancel.setEnabled(True)
-        self._ui.btnCalibrate.setEnabled(True)
+        self._ui.btnCalibrate.setEnabled(False)
         self._devices.enabled = False
 
     def updateWidgets(self, params):
