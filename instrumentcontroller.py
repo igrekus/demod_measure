@@ -99,6 +99,7 @@ class InstrumentController(QObject):
 
     def _check(self, token, device, secondary):
         print(f'launch check with {self.deviceParams[device]} {self.secondaryParams}')
+        self._init()
         return True
 
     def calibrate(self, token, params):
@@ -107,23 +108,157 @@ class InstrumentController(QObject):
 
     def _calibrateLO(self, token, secondary):
         print('run calibrate LO with', secondary)
-        self._init()
-        secondary = self.secondaryParams
-
-
 
         gen_lo = self._instruments['P LO']
-        gen_rf = self._instruments['P RF']
         sa = self._instruments['Анализатор']
 
-        for _ in range(10):
+        secondary = self.secondaryParams
+
+        # TODO:
+        """
+        - измерительное оборудование: генератор гетеродина, генератор РЧ и анализатор спектра
+        - панель оператора: 
+            поле для ввода значения мощности обоих генераторов
+            поле начальной, конечной частоты и шага для генератора гетеродина
+            поле начальной, конечной частоты и шага для генератора РЧ
+
+        - алгоритм: 
+            оператор подключает кабель между генератором гетеродина и АС, задает значения полей;
+            нажимает кнопку "Кабель Гет. калиб."; 
+            провести измерение мощности по заданному циклу, рассчитать значение потерь в кабеле: Потери = Рвх - Рвых; 
+            создать файл-массив "Частота - Потери"; 
+            по завершении цикла оператор подключает кабель между генератором РЧ и АС; 
+            повторить цикл измерения потерь в кабеле по аналогии с гетеродином; сохранить в файл.
+
+        - в программе измерения параметров демодулятора учесть потери в кабелях при выдаче мощности Гет и РЧ.
+
+        Установка линии ТЗ в измерительные графики:
+        - панель оператора:
+        поле ввода значения Кпр согласно ТЗ - на графике Кпр(fгет) отображается горизонтальная прямая линия в соответствии с данным значением;
+        поле ввода значения αош согласно ТЗ - на графике αош(fгет) отображается горизонтальная прямая линия в соответствии с данным значением;
+        поле ввода значения φош согласно ТЗ - на графике φош(fгет) отображается горизонтальная прямая линия в соответствии с данным значением;
+        поле ввода значения αзк согласно ТЗ - на графике αзк(fгет) отображается горизонтальная прямая линия в соответствии с данным значением;
+        поле ввода значения Р1дБ.вх согласно ТЗ - на графике Рвых(Рвх) отображается вертикальная прямая линия в соответствии с данным значением;
+        поле ввода значения Iпот согласно ТЗ - на графике Iпот(Uпит) отображается горизонтальная прямая линия в соответствии с данным значением.
+
+        """
+
+        pow_lo = secondary['Plo_min']
+
+        freq_lo_start = secondary['Flo_min']
+        freq_lo_end = secondary['Flo_max']
+        freq_lo_step = secondary['Flo_delta']
+
+        freq_lo_values = [round(x, 3) for x in
+                          np.arange(start=freq_lo_start, stop=freq_lo_end + 0.0001, step=freq_lo_step)]
+
+        sa.send(':CAL:AUTO OFF')
+        sa.send(':SENS:FREQ:SPAN 1MHz')
+        sa.send(f'DISP:WIND:TRAC:Y:RLEV 10')
+        sa.send(f'DISP:WIND:TRAC:Y:PDIV 5')
+
+        gen_lo.send(f':OUTP:MOD:STAT OFF')
+        gen_lo.send(f'SOUR:POW {pow_lo}dbm')
+
+        sa.send(':CALC:MARK1:MODE POS')
+
+        result = []
+        for freq in freq_lo_values:
+
             if token.cancelled:
-                return False
-            time.sleep(0.5)
+                gen_lo.send(f'OUTP:STAT OFF')
+                time.sleep(0.5)
+
+                gen_lo.send(f'SOUR:POW {pow_lo}dbm')
+
+                gen_lo.send(f'SOUR:FREQ {freq_lo_start}GHz')
+                raise RuntimeError('calibration cancelled')
+
+            gen_lo.send(f'SOUR:FREQ {freq}GHz')
+            gen_lo.send(f'OUTP:STAT ON')
+
+            if not mock_enabled:
+                time.sleep(0.25)
+
+            sa.send(f':SENSe:FREQuency:CENTer {freq}GHz')
+            sa.send(f':CALCulate:MARKer1:X:CENTer {freq}GHz')
+
+            if not mock_enabled:
+                time.sleep(0.25)
+
+            pow_read = float(sa.query(':CALCulate:MARKer:Y?'))
+
+            if mock_enabled:
+                pow_read = 10
+
+            result.append({'f': freq, 'p': pow_read})
+
+        with open('cal_lo.ini', mode='wt', encoding='utf-8') as f:
+            pprint(result, stream=f)
+
         return True
 
     def _calibrateRF(self, token, secondary):
         print('run calibrate RF with', secondary)
+
+        gen_rf = self._instruments['P RF']
+        sa = self._instruments['Анализатор']
+
+        secondary = self.secondaryParams
+
+        pow_rf = secondary['Prf']
+
+        freq_rf_start = secondary['Frf_min']
+        freq_rf_end = secondary['Frf_max']
+        freq_rf_step = secondary['Frf_delta']
+
+        freq_rf_values = [round(x, 3) for x in
+                          np.arange(start=freq_rf_start, stop=freq_rf_end + 0.0001, step=freq_rf_step)]
+
+        sa.send(':CAL:AUTO OFF')
+        sa.send(':SENS:FREQ:SPAN 1MHz')
+        sa.send(f'DISP:WIND:TRAC:Y:RLEV 10')
+        sa.send(f'DISP:WIND:TRAC:Y:PDIV 5')
+
+        # gen_rf.send(f':OUTP:MOD:STAT OFF')
+        gen_rf.send(f'SOUR:POW {pow_rf}dbm')
+
+        sa.send(':CALC:MARK1:MODE POS')
+
+        result = []
+        for freq in freq_rf_values:
+
+            if token.cancelled:
+                gen_rf.send(f'OUTP:STAT OFF')
+                time.sleep(0.5)
+
+                gen_rf.send(f'SOUR:POW {pow_rf}dbm')
+
+                gen_rf.send(f'SOUR:FREQ {freq_rf_start}GHz')
+                raise RuntimeError('calibration cancelled')
+
+            gen_rf.send(f'SOUR:FREQ {freq}GHz')
+            gen_rf.send(f'OUTP:STAT ON')
+
+            if not mock_enabled:
+                time.sleep(0.25)
+
+            sa.send(f':SENSe:FREQuency:CENTer {freq}GHz')
+            sa.send(f':CALCulate:MARKer1:X:CENTer {freq}GHz')
+
+            if not mock_enabled:
+                time.sleep(0.25)
+
+            pow_read = float(sa.query(':CALCulate:MARKer:Y?'))
+
+            if mock_enabled:
+                pow_read = 10
+
+            result.append({'f': freq, 'p': pow_read})
+
+        with open('cal_rf.ini', mode='wt', encoding='utf-8') as f:
+            pprint(result, stream=f)
+
         return True
 
     def measure(self, token, params):
@@ -143,7 +278,6 @@ class InstrumentController(QObject):
         print(f'launch measure with {token} {param} {secondary}')
 
         self._clear()
-        self._init()
         self._measure_s_params(token, param, secondary)
         return True
 
