@@ -43,7 +43,7 @@ class MeasureResult:
         p_loss = data['loss']
         phase = data['phase']
 
-        p_pch = 30 + 10 * log10(((ui/2) ** 2) / 100)
+        p_pch = 30 + 10 * log10(((ui / 2) ** 2) / 100)
         kp_loss = p_pch - p_rf + p_loss
         a_err_times = uq / ui
         a_err_db = 20 * (log10(uq) - log10(ui))
