@@ -66,7 +66,7 @@ class MeasureResult:
             'p_pch': round(p_pch, 1),
             'kp_loss': round(kp_loss, 2),
             'a_err_times': round(a_err_times, 2),
-            'a_err_db': abs(round(a_err_db, 2)),
+            'a_err_db': round(a_err_db, 2),
             'ph_err': round(ph_err, 2),
             'a_zk': round(a_zk, 2),
             'loss': data['loss'],
