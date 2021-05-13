@@ -12,7 +12,6 @@ from instr.instrumentfactory import mock_enabled, OscilloscopeFactory, Generator
 from measureresult import MeasureResult
 
 
-# TODO calibration
 # TODO add attenuation field -- calculate each pow point + att power
 
 class InstrumentController(QObject):
