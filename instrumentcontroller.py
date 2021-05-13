@@ -105,9 +105,10 @@ class InstrumentController(QObject):
         print(f'call calibrate with {token} {params}')
         return self._calibrate(token, self.secondaryParams)
 
-    def _calibrate(self, token, secondary):
-        print('run calibrate with', secondary)
+    def _calibrateLO(self, token, secondary):
+        print('run calibrate LO with', secondary)
         self._init()
+        secondary = self.secondaryParams
 
 
 
@@ -119,6 +120,10 @@ class InstrumentController(QObject):
             if token.cancelled:
                 return False
             time.sleep(0.5)
+        return True
+
+    def _calibrateRF(self, token, secondary):
+        print('run calibrate RF with', secondary)
         return True
 
     def measure(self, token, params):
