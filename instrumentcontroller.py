@@ -68,6 +68,16 @@ class InstrumentController(QObject):
             with open('./params.ini', 'rt', encoding='utf-8') as f:
                 self.secondaryParams = ast.literal_eval(''.join(f.readlines()))
 
+        self._calibrated_pows_lo = dict()
+        if isfile('./cal_lo.ini'):
+            with open('./cal_lo.ini', mode='rt', encoding='utf-8') as f:
+                self._calibrated_pows_lo = ast.literal_eval(''.join(f.readlines()))
+
+        self._calibrated_pows_rf = dict()
+        if isfile('./cal_rf.ini'):
+            with open('./cal_rf.ini', mode='rt', encoding='utf-8') as f:
+                self._calibrated_pows_rf = ast.literal_eval(''.join(f.readlines()))
+
         self._instruments = dict()
         self.found = False
         self.present = False
@@ -162,7 +172,7 @@ class InstrumentController(QObject):
 
         sa.send(':CALC:MARK1:MODE POS')
 
-        result = []
+        result = {}
         for freq in freq_lo_values:
 
             if token.cancelled:
@@ -191,7 +201,7 @@ class InstrumentController(QObject):
             if mock_enabled:
                 pow_read = 10
 
-            result.append({'f': freq, 'p': pow_read})
+            result[freq] = pow_read
 
         with open('cal_lo.ini', mode='wt', encoding='utf-8') as f:
             pprint(result, stream=f)
@@ -225,7 +235,7 @@ class InstrumentController(QObject):
 
         sa.send(':CALC:MARK1:MODE POS')
 
-        result = []
+        result = {}
         for freq in freq_rf_values:
 
             if token.cancelled:
@@ -254,7 +264,7 @@ class InstrumentController(QObject):
             if mock_enabled:
                 pow_read = 10
 
-            result.append({'f': freq, 'p': pow_read})
+            result[freq] = pow_read
 
         with open('cal_rf.ini', mode='wt', encoding='utf-8') as f:
             pprint(result, stream=f)
@@ -349,8 +359,6 @@ class InstrumentController(QObject):
         freq_rf_values = [round(x, 3) for x in
                           np.arange(start=freq_rf_start, stop=freq_rf_end + 0.0001, step=freq_rf_step)]
 
-        gen_rf.send(f'SOUR:POW {pow_rf}dbm')
-
         gen_lo.send(f':OUTP:MOD:STAT OFF')
         # gen_rf.send(f':OUTP:MOD:STAT OFF')
 
@@ -362,7 +370,6 @@ class InstrumentController(QObject):
 
         res = []
         for pow_lo in pow_lo_values:
-            gen_lo.send(f'SOUR:POW {pow_lo}dbm')
 
             for freq_lo, freq_rf in zip(freq_lo_values, freq_rf_values):
 
@@ -378,6 +385,9 @@ class InstrumentController(QObject):
                     gen_rf.send(f'SOUR:FREQ {freq_rf_start}GHz')
                     gen_lo.send(f'SOUR:FREQ {freq_rf_start}GHz')
                     raise RuntimeError('measurement cancelled')
+
+                gen_lo.send(f'SOUR:POW {pow_lo + self._calibrated_pows_lo.get(freq_lo, 0)}dbm')
+                gen_rf.send(f'SOUR:POW {pow_rf + self._calibrated_pows_rf.get(freq_rf, 0)}dbm')
 
                 gen_lo.send(f'SOUR:FREQ {freq_lo}GHz')
                 gen_rf.send(f'SOUR:FREQ {freq_rf}GHz')
