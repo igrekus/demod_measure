@@ -1,5 +1,7 @@
+import ast
+import os
 import datetime
-import os.path
+import pprint
 
 from collections import defaultdict
 from math import log10, cos, radians
@@ -27,6 +29,11 @@ class MeasureResult:
         self.data2 = defaultdict(list)
         self.data3 = defaultdict(list)
         self.data4 = defaultdict(list)
+
+        self.adjustment = None
+        if os.path.isfile('./adjust.ini'):
+            with open('./adjust.ini', 'rt', encoding='utf-8') as f:
+                self.adjustment = ast.literal_eval(''.join(f.readlines()))
 
     def __bool__(self):
         return self.ready
@@ -97,6 +104,23 @@ class MeasureResult:
     def add_point(self, data):
         self._raw.append(data)
         self._process_point(data)
+
+    def save_adjustment_template(self):
+        if self.adjustment is None:
+            print('measured, saving template')
+            self.adjustment = [{
+                'p_lo': p['p_lo'],
+                'f_lo': p['f_lo'],
+                'p_rf': p['p_rf'],
+                'f_rf': p['f_rf'],
+                'kp_loss': p['kp_loss'],
+                'a_err_db': p['a_err_db'],
+                'ph_err': p['ph_err'],
+                'a_zk': p['a_zk'],
+
+            } for p in self._processed]
+        with open('adjust.ini', mode='wt', encoding='utf-8') as f:
+            pprint.pprint(self.adjustment, stream=f, sort_dicts=False)
 
     @property
     def report(self):
