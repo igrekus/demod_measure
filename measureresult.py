@@ -113,10 +113,10 @@ class MeasureResult:
                 'f_lo': p['f_lo'],
                 'p_rf': p['p_rf'],
                 'f_rf': p['f_rf'],
-                'kp_loss': p['kp_loss'],
-                'a_err_db': p['a_err_db'],
-                'ph_err': p['ph_err'],
-                'a_zk': p['a_zk'],
+                'kp_loss': 0,
+                'a_err_db': 0,
+                'ph_err': 0,
+                'a_zk': 0,
 
             } for p in self._processed]
         with open('adjust.ini', mode='wt', encoding='utf-8') as f:
