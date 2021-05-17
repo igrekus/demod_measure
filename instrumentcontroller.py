@@ -54,6 +54,7 @@ class InstrumentController(QObject):
             'Flo_min': 0.1,
             'Flo_max': 3.0,
             'Flo_delta': 0.1,
+            'half_f_lo': False,
             'Prf': -10.0,
             'Frf_min': 0.11,
             'Frf_max': 3.1,
@@ -61,6 +62,7 @@ class InstrumentController(QObject):
             'Usrc': 5.0,
             'OscAvg': True,
             'loss': 0.82,
+            'scale_y': 0.7,
         }
 
         if isfile('./params.ini'):
@@ -317,6 +319,7 @@ class InstrumentController(QObject):
         freq_lo_start = secondary['Flo_min']
         freq_lo_end = secondary['Flo_max']
         freq_lo_step = secondary['Flo_delta']
+        freq_lo_half = secondary['half_f_lo']
 
         pow_rf = secondary['Prf']
         freq_rf_start = secondary['Frf_min']
@@ -326,6 +329,8 @@ class InstrumentController(QObject):
         loss = secondary['loss']
 
         osc_avg = 'ON' if secondary['OscAvg'] else 'OFF'
+
+        osc_scale = secondary['scale_y']
 
         src.send(f'APPLY p6v,{src_u}V,{src_i}mA')
 
@@ -371,6 +376,9 @@ class InstrumentController(QObject):
         for pow_lo in pow_lo_values:
 
             for freq_lo, freq_rf in zip(freq_lo_values, freq_rf_values):
+
+                if freq_lo_half:
+                    freq_lo /= 2
 
                 if token.cancelled:
                     gen_lo.send(f'OUTP:STAT OFF')
@@ -432,8 +440,8 @@ class InstrumentController(QObject):
                         # and iterate OSC range scaling a few times
                         # to get the correct reading
                         while osc_ch1_amp > 1_000_000 or osc_ch2_amp > 1_000_000:
-                            osc.send(f':CHANnel1:RANGe 0.7')
-                            osc.send(f':CHANnel2:RANGe 0.7')
+                            osc.send(f':CHANnel1:RANGe {osc_scale}')
+                            osc.send(f':CHANnel2:RANGe {osc_scale}')
 
                             osc.send(':CDIS')
 
