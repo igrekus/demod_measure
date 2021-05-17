@@ -57,6 +57,14 @@ class MeasureResult:
         ph_err = phase + 90
         a_zk = 10 * log10((1 + a_err_times ** 2 - 2 * a_err_times * cos(radians(ph_err))) /
                           (1 + a_err_times ** 2 + 2 * a_err_times * cos(radians(ph_err))))
+
+        if self.adjustment is not None:
+            point = self.adjustment[len(self._processed)]
+            kp_loss += point['kp_loss']
+            a_err_db += point['a_err_db']
+            ph_err += point['ph_err']
+            a_zk += point['a_zk']
+
         self._report = {
             'p_lo': data['p_lo'],
             'f_lo': f_lo,
