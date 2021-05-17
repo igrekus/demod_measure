@@ -227,6 +227,10 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinFloDelta.setSuffix(' ГГц')
         self._devices._layout.addRow('ΔFгет=', self._spinFloDelta)
 
+        self._checkHalfFreqLo = QCheckBox(parent=self)
+        self._checkHalfFreqLo.setChecked(False)
+        self._devices._layout.addRow('1/2 Fгет.', self._checkHalfFreqLo)
+
         self._spinPrf = QDoubleSpinBox(parent=self)
         self._spinPrf.setMinimum(-50)
         self._spinPrf.setMaximum(50)
@@ -279,6 +283,14 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinLoss.setSuffix(' дБ')
         self._devices._layout.addRow('Loss=', self._spinLoss)
 
+        self._spinScaleOscY = QDoubleSpinBox(parent=self)
+        self._spinScaleOscY.setMinimum(0)
+        self._spinScaleOscY.setMaximum(2)
+        self._spinScaleOscY.setSingleStep(0.1)
+        self._spinScaleOscY.setValue(0.7)
+        self._spinScaleOscY.setSuffix(' мВ')
+        self._devices._layout.addRow('Scale y=', self._spinScaleOscY)
+
         self._connectSignals()
 
     def _connectSignals(self):
@@ -288,6 +300,7 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinFloMin.valueChanged.connect(self.on_params_changed)
         self._spinFloMax.valueChanged.connect(self.on_params_changed)
         self._spinFloDelta.valueChanged.connect(self.on_params_changed)
+        self._checkHalfFreqLo.toggled.connect(self.on_params_changed)
 
         self._spinPrf.valueChanged.connect(self.on_params_changed)
         self._spinFrfMin.valueChanged.connect(self.on_params_changed)
@@ -299,6 +312,8 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._checkOscAvg.toggled.connect(self.on_params_changed)
 
         self._spinLoss.valueChanged.connect(self.on_params_changed)
+
+        self._spinScaleOscY.valueChanged.connect(self.on_params_changed)
 
     def check(self):
         print('subclass checking...')
@@ -365,6 +380,7 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
             'Flo_min': self._spinFloMin.value(),
             'Flo_max': self._spinFloMax.value(),
             'Flo_delta': self._spinFloDelta.value(),
+            'half_f_lo': self._checkHalfFreqLo.isChecked(),
 
             'Prf': self._spinPrf.value(),
             'Frf_min': self._spinFrfMin.value(),
@@ -376,6 +392,8 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
             'OscAvg': self._checkOscAvg.isChecked(),
 
             'loss': self._spinLoss.value(),
+
+            'scale_y': self._spinScaleOscY.value(),
         }
         self.secondaryChanged.emit(params)
 
@@ -386,6 +404,7 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinFloMin.setValue(params['Flo_min'])
         self._spinFloMax.setValue(params['Flo_max'])
         self._spinFloDelta.setValue(params['Flo_delta'])
+        self._checkHalfFreqLo.setChecked(params['half_f_lo'])
         self._spinPrf.setValue(params['Prf'])
         self._spinFrfMin.setValue(params['Frf_min'])
         self._spinFrfMax.setValue(params['Frf_max'])
@@ -393,3 +412,4 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinUsrc.setValue(params['Usrc'])
         self._checkOscAvg.setChecked(params['OscAvg'])
         self._spinLoss.setValue(params['loss'])
+        self._spinScaleOscY.setValue(params['scale_y'])
