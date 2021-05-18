@@ -442,6 +442,20 @@ class InstrumentController(QObject):
                         # and iterate OSC range scaling a few times
                         # to get the correct reading
                         while osc_ch1_amp > 1_000_000 or osc_ch2_amp > 1_000_000:
+
+                            if token.cancelled:
+                                gen_lo.send(f'OUTP:STAT OFF')
+                                gen_rf.send(f'OUTP:STAT OFF')
+                                time.sleep(0.5)
+                                src.send('OUTPut OFF')
+
+                                gen_rf.send(f'SOUR:POW {pow_rf}dbm')
+                                gen_lo.send(f'SOUR:POW {pow_lo_start}dbm')
+
+                                gen_rf.send(f'SOUR:FREQ {freq_rf_start}GHz')
+                                gen_lo.send(f'SOUR:FREQ {freq_rf_start}GHz')
+                                raise RuntimeError('measurement cancelled')
+
                             osc.send(f':CHANnel1:RANGe {osc_scale}')
                             osc.send(f':CHANnel2:RANGe {osc_scale}')
 
