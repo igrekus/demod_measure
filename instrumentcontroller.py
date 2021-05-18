@@ -198,11 +198,11 @@ class InstrumentController(QObject):
                 time.sleep(0.25)
 
             pow_read = float(sa.query(':CALCulate:MARKer:Y?'))
-
+            loss = abs(pow_lo - pow_read)
             if mock_enabled:
-                pow_read = 10
+                loss = 10
 
-            result[freq] = pow_read
+            result[freq] = loss
 
         with open('cal_lo.ini', mode='wt', encoding='utf-8') as f:
             pprint(result, stream=f)
@@ -261,11 +261,11 @@ class InstrumentController(QObject):
                 time.sleep(0.25)
 
             pow_read = float(sa.query(':CALCulate:MARKer:Y?'))
-
+            loss = abs(pow_rf - pow_read)
             if mock_enabled:
-                pow_read = 10
+                loss = 10
 
-            result[freq] = pow_read
+            result[freq] = loss
 
         with open('cal_rf.ini', mode='wt', encoding='utf-8') as f:
             pprint(result, stream=f)
