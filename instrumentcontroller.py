@@ -207,6 +207,7 @@ class InstrumentController(QObject):
         with open('cal_lo.ini', mode='wt', encoding='utf-8') as f:
             pprint(result, stream=f)
 
+        gen_lo.send(f'OUTP:STAT OFF')
         return True
 
     def _calibrateRF(self, token, secondary):
@@ -270,6 +271,7 @@ class InstrumentController(QObject):
         with open('cal_rf.ini', mode='wt', encoding='utf-8') as f:
             pprint(result, stream=f)
 
+        gen_rf.send(f'OUTP:STAT OFF')
         return True
 
     def measure(self, token, params):
