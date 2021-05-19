@@ -276,6 +276,7 @@ class InstrumentController(QObject):
             if mock_enabled:
                 loss = 10
 
+            print('loss: ', loss)
             result[freq] = loss
 
         with open('cal_rf.ini', mode='wt', encoding='utf-8') as f:
