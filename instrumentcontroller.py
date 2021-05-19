@@ -3,6 +3,7 @@ import time
 
 import numpy as np
 
+from collections import defaultdict
 from pprint import pprint
 from os.path import isfile
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
@@ -154,12 +155,15 @@ class InstrumentController(QObject):
 
         """
 
-        pow_lo = secondary['Plo_min']
-
+        pow_lo_start = secondary['Plo_min']
+        pow_lo_end = secondary['Plo_max']
+        pow_lo_step = secondary['Plo_delta']
         freq_lo_start = secondary['Flo_min']
         freq_lo_end = secondary['Flo_max']
         freq_lo_step = secondary['Flo_delta']
 
+        pow_lo_values = [round(x, 3) for x in np.arange(start=pow_lo_start, stop=pow_lo_end + 0.002, step=pow_lo_step)] \
+            if pow_lo_start != pow_lo_end else [pow_lo_start]
         freq_lo_values = [round(x, 3) for x in
                           np.arange(start=freq_lo_start, stop=freq_lo_end + 0.0001, step=freq_lo_step)]
 
@@ -169,41 +173,45 @@ class InstrumentController(QObject):
         sa.send(f'DISP:WIND:TRAC:Y:PDIV 5')
 
         gen_lo.send(f':OUTP:MOD:STAT OFF')
-        gen_lo.send(f'SOUR:POW {pow_lo}dbm')
 
         sa.send(':CALC:MARK1:MODE POS')
 
-        result = {}
-        for freq in freq_lo_values:
+        result = defaultdict(dict)
+        for pow_lo in pow_lo_values:
+            gen_lo.send(f'SOUR:POW {pow_lo}dbm')
 
-            if token.cancelled:
-                gen_lo.send(f'OUTP:STAT OFF')
-                time.sleep(0.5)
+            for freq in freq_lo_values:
 
-                gen_lo.send(f'SOUR:POW {pow_lo}dbm')
+                if token.cancelled:
+                    gen_lo.send(f'OUTP:STAT OFF')
+                    time.sleep(0.5)
 
-                gen_lo.send(f'SOUR:FREQ {freq_lo_start}GHz')
-                raise RuntimeError('calibration cancelled')
+                    gen_lo.send(f'SOUR:POW {pow_lo}dbm')
 
-            gen_lo.send(f'SOUR:FREQ {freq}GHz')
-            gen_lo.send(f'OUTP:STAT ON')
+                    gen_lo.send(f'SOUR:FREQ {freq_lo_start}GHz')
+                    raise RuntimeError('calibration cancelled')
 
-            if not mock_enabled:
-                time.sleep(0.25)
+                gen_lo.send(f'SOUR:FREQ {freq}GHz')
+                gen_lo.send(f'OUTP:STAT ON')
 
-            sa.send(f':SENSe:FREQuency:CENTer {freq}GHz')
-            sa.send(f':CALCulate:MARKer1:X:CENTer {freq}GHz')
+                if not mock_enabled:
+                    time.sleep(0.25)
 
-            if not mock_enabled:
-                time.sleep(0.25)
+                sa.send(f':SENSe:FREQuency:CENTer {freq}GHz')
+                sa.send(f':CALCulate:MARKer1:X:CENTer {freq}GHz')
 
-            pow_read = float(sa.query(':CALCulate:MARKer:Y?'))
-            loss = abs(pow_lo - pow_read)
-            if mock_enabled:
-                loss = 10
+                if not mock_enabled:
+                    time.sleep(0.25)
 
-            result[freq] = loss
+                pow_read = float(sa.query(':CALCulate:MARKer:Y?'))
+                loss = abs(pow_lo - pow_read)
+                if mock_enabled:
+                    loss = 10
 
+                print('loss: ', loss)
+                result[pow_lo][freq] = loss
+
+        result = {k: v for k, v in result.items()}
         with open('cal_lo.ini', mode='wt', encoding='utf-8') as f:
             pprint(result, stream=f)
 
