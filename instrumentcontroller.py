@@ -217,6 +217,7 @@ class InstrumentController(QObject):
 
         gen_lo.send(f'OUTP:STAT OFF')
         sa.send(':CAL:AUTO ON')
+        self._calibrated_pows_lo = result
         return True
 
     def _calibrateRF(self, token, secondary):
@@ -282,6 +283,7 @@ class InstrumentController(QObject):
 
         gen_rf.send(f'OUTP:STAT OFF')
         sa.send(':CAL:AUTO ON')
+        self._calibrated_pows_rf = result
         return True
 
     def measure(self, token, params):
