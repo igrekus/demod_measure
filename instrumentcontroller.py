@@ -481,18 +481,15 @@ class InstrumentController(QObject):
                             osc.send(f':CHANnel1:RANGe {rng}')
                             osc.send(f':CHANnel2:RANGe {rng}')
 
-                p_lo_read = float(gen_lo.query('SOUR:POW?'))
                 f_lo_read = float(gen_lo.query('SOUR:FREQ?'))
-
-                p_rf_read = float(gen_rf.query('SOUR:POW?'))
                 f_rf_read = float(gen_rf.query('SOUR:FREQ?'))
 
                 i_src_read = float(mult.query('MEAS:CURR:DC? 1A,DEF'))
 
                 raw_point = {
-                    'p_lo': p_lo_read,
+                    'p_lo': pow_lo,
                     'f_lo': f_lo_read,
-                    'p_rf': p_rf_read,
+                    'p_rf': pow_rf,
                     'f_rf': f_rf_read,
                     'u_src': src_u,   # power source voltage
                     'i_src': i_src_read,
