@@ -408,8 +408,8 @@ class InstrumentController(QObject):
                     gen_lo.send(f'SOUR:FREQ {freq_rf_start}GHz')
                     raise RuntimeError('measurement cancelled')
 
-                gen_lo.send(f'SOUR:POW {pow_lo + self._calibrated_pows_lo.get(freq_lo, 0) / 2}dbm')
-                gen_rf.send(f'SOUR:POW {pow_rf + self._calibrated_pows_rf.get(freq_rf, 0) / 2}dbm')
+                gen_lo.send(f'SOUR:POW {round(pow_lo + self._calibrated_pows_lo[pow_lo].get(freq_lo, 0) / 2, 2)}dbm')
+                gen_rf.send(f'SOUR:POW {round(pow_rf + self._calibrated_pows_rf.get(freq_rf, 0) / 2, 2)}dbm')
 
                 gen_lo.send(f'SOUR:FREQ {freq_lo}GHz')
                 gen_rf.send(f'SOUR:FREQ {freq_rf}GHz')
