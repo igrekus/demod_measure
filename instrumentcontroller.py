@@ -146,7 +146,7 @@ class InstrumentController(QObject):
         freq_lo_start = secondary['Flo_min']
         freq_lo_end = secondary['Flo_max']
         freq_lo_step = secondary['Flo_delta']
-        freq_lo_half = secondary['half_f_lo']
+        freq_lo_x2 = secondary['half_x2_f_lo']
 
         pow_lo_values = [round(x, 3) for x in np.arange(start=pow_lo_start, stop=pow_lo_end + 0.002, step=pow_lo_step)] \
             if pow_lo_start != pow_lo_end else [pow_lo_start]
@@ -168,7 +168,7 @@ class InstrumentController(QObject):
 
             for freq in freq_lo_values:
 
-                if freq_lo_half:
+                if freq_lo_x2:
                     freq *= 2
 
                 if token.cancelled:
@@ -323,7 +323,7 @@ class InstrumentController(QObject):
         freq_lo_start = secondary['Flo_min']
         freq_lo_end = secondary['Flo_max']
         freq_lo_step = secondary['Flo_delta']
-        freq_lo_half = secondary['half_x2_f_lo']
+        freq_lo_x2 = secondary['half_x2_f_lo']
 
         pow_rf = secondary['Prf']
         freq_rf_start = secondary['Frf_min']
@@ -382,7 +382,7 @@ class InstrumentController(QObject):
 
             for freq_lo, freq_rf in zip(freq_lo_values, freq_rf_values):
 
-                if freq_lo_half:
+                if freq_lo_x2:
                     freq_lo *= 2
 
                 if token.cancelled:
