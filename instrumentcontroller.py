@@ -145,6 +145,7 @@ class InstrumentController(QObject):
         freq_lo_start = secondary['Flo_min']
         freq_lo_end = secondary['Flo_max']
         freq_lo_step = secondary['Flo_delta']
+        freq_lo_half = secondary['half_f_lo']
 
         pow_lo_values = [round(x, 3) for x in np.arange(start=pow_lo_start, stop=pow_lo_end + 0.002, step=pow_lo_step)] \
             if pow_lo_start != pow_lo_end else [pow_lo_start]
@@ -165,6 +166,9 @@ class InstrumentController(QObject):
             gen_lo.send(f'SOUR:POW {pow_lo}dbm')
 
             for freq in freq_lo_values:
+
+                if freq_lo_half:
+                    freq /= 2
 
                 if token.cancelled:
                     gen_lo.send(f'OUTP:STAT OFF')
