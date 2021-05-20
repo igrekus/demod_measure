@@ -77,6 +77,7 @@ class InstrumentController(QObject):
             'OscAvg': True,
             'loss': 0.82,
             'scale_y': 0.7,
+            'timebase_coeff': 1.0,
         }
 
         if isfile('./params.ini'):
@@ -334,6 +335,7 @@ class InstrumentController(QObject):
         osc_avg = 'ON' if secondary['OscAvg'] else 'OFF'
 
         osc_scale = secondary['scale_y']
+        osc_timebase_coeff = secondary['timebase_coeff']
 
         src.send(f'APPLY p6v,{src_u}V,{src_i}mA')
 
@@ -396,7 +398,7 @@ class InstrumentController(QObject):
                     gen_lo.send(f'SOUR:FREQ {freq_rf_start}GHz')
                     raise RuntimeError('measurement cancelled')
 
-                gen_lo.send(f'SOUR:POW {round(pow_lo + self._calibrated_pows_lo[pow_lo].get(freq_lo, 0) / 2, 2)}dbm')
+                gen_lo.send(f'SOUR:POW {round(pow_lo + self._calibrated_pows_lo.get(pow_lo, {}).get(freq_lo, 0) / 2, 2)}dbm')
                 gen_rf.send(f'SOUR:POW {round(pow_rf + self._calibrated_pows_rf.get(freq_rf, 0) / 2, 2)}dbm')
 
                 gen_lo.send(f'SOUR:FREQ {freq_lo}GHz')
@@ -425,7 +427,7 @@ class InstrumentController(QObject):
                 osc_phase = float(stats_split[11])
                 osc_ch1_freq = float(stats_split[4])
 
-                timebase = (1 / (abs(freq_rf - freq_lo) * 10_000_000)) * 0.01
+                timebase = (1 / (abs(freq_rf - freq_lo) * 10_000_000)) * 0.01 * osc_timebase_coeff
                 osc.send(f':TIMEBASE:SCALE {timebase}')  # ms / div
                 osc.send(f':CHANnel1:OFFSet 0')
                 osc.send(f':CHANnel2:OFFSet 0')

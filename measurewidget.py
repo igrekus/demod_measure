@@ -295,6 +295,13 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinScaleOscY.setSuffix(' мВ')
         self._devices._layout.addRow('Scale y=', self._spinScaleOscY)
 
+        self._spinTimeBaseCoeff = QDoubleSpinBox(parent=self)
+        self._spinTimeBaseCoeff.setMinimum(-100)
+        self._spinTimeBaseCoeff.setMaximum(100)
+        self._spinTimeBaseCoeff.setSingleStep(0.1)
+        self._spinTimeBaseCoeff.setValue(1)
+        self._devices._layout.addRow('Tbase.coeff=', self._spinTimeBaseCoeff)
+
         self._connectSignals()
 
     def _connectSignals(self):
@@ -318,6 +325,7 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinLoss.valueChanged.connect(self.on_params_changed)
 
         self._spinScaleOscY.valueChanged.connect(self.on_params_changed)
+        self._spinTimeBaseCoeff.valueChanged.connect(self.on_params_changed)
 
     def check(self):
         print('subclass checking...')
@@ -398,6 +406,7 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
             'loss': self._spinLoss.value(),
 
             'scale_y': self._spinScaleOscY.value(),
+            'timebase_coeff': self._spinTimeBaseCoeff.value(),
         }
         self.secondaryChanged.emit(params)
 
@@ -417,3 +426,4 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._checkOscAvg.setChecked(params['OscAvg'])
         self._spinLoss.setValue(params['loss'])
         self._spinScaleOscY.setValue(params['scale_y'])
+        self._spinTimeBaseCoeff.setValue(params['timebase_coeff'])
