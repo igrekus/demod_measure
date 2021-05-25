@@ -427,7 +427,7 @@ class InstrumentController(QObject):
                 osc_phase = float(stats_split[11])
                 osc_ch1_freq = float(stats_split[4])
 
-                timebase = (1 / (abs(freq_rf - freq_lo) * 10_000_000)) * 0.01 * osc_timebase_coeff
+                timebase = (1 / (abs(freq_rf - ((freq_lo / 2) if freq_lo_x2 else freq_lo)) * 10_000_000)) * 0.01 * osc_timebase_coeff
                 osc.send(f':TIMEBASE:SCALE {timebase}')  # ms / div
                 osc.send(f':CHANnel1:OFFSet 0')
                 osc.send(f':CHANnel2:OFFSet 0')
