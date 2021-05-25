@@ -13,7 +13,6 @@ from instr.instrumentfactory import mock_enabled, OscilloscopeFactory, Generator
 from measureresult import MeasureResult
 
 
-# TODO add attenuation field -- calculate each pow point + att power
 # TODO:
 # """
 # Установка линии ТЗ в измерительные графики:
@@ -24,8 +23,8 @@ from measureresult import MeasureResult
 # поле ввода значения αзк согласно ТЗ - на графике αзк(fгет) отображается горизонтальная прямая линия в соответствии с данным значением;
 # поле ввода значения Р1дБ.вх согласно ТЗ - на графике Рвых(Рвх) отображается вертикальная прямая линия в соответствии с данным значением;
 # поле ввода значения Iпот согласно ТЗ - на графике Iпот(Uпит) отображается горизонтальная прямая линия в соответствии с данным значением.
-#
 # """
+# TODO screenshot
 
 
 class InstrumentController(QObject):
