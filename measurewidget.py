@@ -260,7 +260,7 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinFrfMax.setMinimum(0)
         self._spinFrfMax.setMaximum(40)
         self._spinFrfMax.setSingleStep(1)
-        self._spinFrfMax.setValue(3.11)
+        self._spinFrfMax.setValue(3.1)
         self._spinFrfMax.setSuffix(' ГГц')
         self._devices._layout.addRow('Fвх.макс=', self._spinFrfMax)
 
