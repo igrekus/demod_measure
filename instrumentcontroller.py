@@ -5,12 +5,12 @@ import numpy as np
 
 from collections import defaultdict
 from pprint import pprint
-from os.path import isfile
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
 from instr.instrumentfactory import mock_enabled, OscilloscopeFactory, GeneratorFactory, SourceFactory, \
     MultimeterFactory, AnalyzerFactory
 from measureresult import MeasureResult
+from util.file import load_ast_if_exists, pprint_to_file
 
 
 # TODO:
@@ -32,26 +32,23 @@ class InstrumentController(QObject):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
 
-        self.requiredInstruments = {
-            'Осциллограф': OscilloscopeFactory('GPIB1::7::INSTR'),
-            'Анализатор': OscilloscopeFactory('GPIB1::18::INSTR'),
-            'P LO': GeneratorFactory('GPIB1::6::INSTR'),
-            'P RF': GeneratorFactory('GPIB1::20::INSTR'),
-            'Источник': SourceFactory('GPIB1::3::INSTR'),
-            'Мультиметр': MultimeterFactory('GPIB1::22::INSTR'),
-        }
+        addrs = load_ast_if_exists('instr.ini', default={
+            'Осциллограф': 'GPIB1::7::INSTR',
+            'Анализатор': 'GPIB1::18::INSTR',
+            'P LO': 'GPIB1::6::INSTR',
+            'P RF': 'GPIB1::20::INSTR',
+            'Источник': 'GPIB1::3::INSTR',
+            'Мультиметр': 'GPIB1::22::INSTR',
+        })
 
-        if isfile('./instr.ini'):
-            with open('./instr.ini', mode='rt', encoding='utf-8') as f:
-                addrs = ast.literal_eval(''.join(f.readlines()))
-                self.requiredInstruments = {
-                    'Осциллограф': OscilloscopeFactory(addrs['Осциллограф']),
-                    'Анализатор': AnalyzerFactory(addrs['Анализатор']),
-                    'P LO': GeneratorFactory(addrs['P LO']),
-                    'P RF': GeneratorFactory(addrs['P RF']),
-                    'Источник': SourceFactory(addrs['Источник']),
-                    'Мультиметр': MultimeterFactory(addrs['Мультиметр']),
-                }
+        self.requiredInstruments = {
+            'Осциллограф': OscilloscopeFactory(addrs['Осциллограф']),
+            'Анализатор': AnalyzerFactory(addrs['Анализатор']),
+            'P LO': GeneratorFactory(addrs['P LO']),
+            'P RF': GeneratorFactory(addrs['P RF']),
+            'Источник': SourceFactory(addrs['Источник']),
+            'Мультиметр': MultimeterFactory(addrs['Мультиметр']),
+        }
 
         self.deviceParams = {
             'Демодулятор': {
@@ -59,7 +56,7 @@ class InstrumentController(QObject):
             },
         }
 
-        self.secondaryParams = {
+        self.secondaryParams = load_ast_if_exists('params.ini', default={
             'Plo_min': -10.0,
             'Plo_max': -10.0,
             'Plo_delta': 1.0,
@@ -76,21 +73,10 @@ class InstrumentController(QObject):
             'loss': 0.82,
             'scale_y': 0.7,
             'timebase_coeff': 1.0,
-        }
+        })
 
-        if isfile('./params.ini'):
-            with open('./params.ini', 'rt', encoding='utf-8') as f:
-                self.secondaryParams = ast.literal_eval(''.join(f.readlines()))
-
-        self._calibrated_pows_lo = dict()
-        if isfile('./cal_lo.ini'):
-            with open('./cal_lo.ini', mode='rt', encoding='utf-8') as f:
-                self._calibrated_pows_lo = ast.literal_eval(''.join(f.readlines()))
-
-        self._calibrated_pows_rf = dict()
-        if isfile('./cal_rf.ini'):
-            with open('./cal_rf.ini', mode='rt', encoding='utf-8') as f:
-                self._calibrated_pows_rf = ast.literal_eval(''.join(f.readlines()))
+        self._calibrated_pows_lo = load_ast_if_exists('cal_lo.ini', default={})
+        self._calibrated_pows_rf = load_ast_if_exists('cal_rf.ini', default={})
 
         self._instruments = dict()
         self.found = False
