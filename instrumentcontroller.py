@@ -513,7 +513,3 @@ class InstrumentController(QObject):
     @property
     def status(self):
         return [i.status for i in self._instruments.values()]
-
-
-def parse_float_list(lst):
-    return [float(x) for x in lst.split(',')]
