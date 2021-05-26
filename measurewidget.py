@@ -1,8 +1,9 @@
 from PyQt5 import uic
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, QRunnable, QThreadPool
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QRunnable, QThreadPool, QTimer
 from PyQt5.QtWidgets import QWidget, QDoubleSpinBox, QCheckBox
 
 from deviceselectwidget import DeviceSelectWidget
+from util.file import remove_if_exists
 
 
 class MeasureTask(QRunnable):
@@ -180,6 +181,10 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         super().__init__(parent=parent, controller=controller)
 
         self._token = CancelToken()
+
+        self._uiDebouncer = QTimer()
+        self._uiDebouncer.setSingleShot(True)
+        self._uiDebouncer.timeout.connect(self.on_debounced_gui)
 
         self._params = 0
 
@@ -385,6 +390,8 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
             self._token.cancelled = True
 
     def on_params_changed(self, value):
+        self._uiDebouncer.start(5000)
+
         params = {
             'Plo_min': self._spinPloMin.value(),
             'Plo_max': self._spinPloMax.value(),
@@ -427,3 +434,8 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinLoss.setValue(params['loss'])
         self._spinScaleOscY.setValue(params['scale_y'])
         self._spinTimeBaseCoeff.setValue(params['timebase_coeff'])
+
+    def on_debounced_gui(self):
+        remove_if_exists('cal_lo.ini')
+        remove_if_exists('cal_rf.ini')
+        remove_if_exists('adjust.ini')
