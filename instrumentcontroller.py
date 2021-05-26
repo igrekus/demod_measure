@@ -4,7 +4,6 @@ import time
 import numpy as np
 
 from collections import defaultdict
-from pprint import pprint
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
 from instr.instrumentfactory import mock_enabled, OscilloscopeFactory, GeneratorFactory, SourceFactory, \
@@ -185,8 +184,7 @@ class InstrumentController(QObject):
                 result[pow_lo][freq] = loss
 
         result = {k: v for k, v in result.items()}
-        with open('cal_lo.ini', mode='wt', encoding='utf-8') as f:
-            pprint(result, stream=f)
+        pprint_to_file('cal_lo.ini', result)
 
         gen_lo.send(f'OUTP:STAT OFF')
         sa.send(':CAL:AUTO ON')
@@ -252,8 +250,7 @@ class InstrumentController(QObject):
             print('loss: ', loss)
             result[freq] = loss
 
-        with open('cal_rf.ini', mode='wt', encoding='utf-8') as f:
-            pprint(result, stream=f)
+        pprint_to_file('cal_rf.ini', result)
 
         gen_rf.send(f'OUTP:STAT OFF')
         sa.send(':CAL:AUTO ON')
@@ -507,8 +504,7 @@ class InstrumentController(QObject):
         self.pointReady.emit()
 
     def saveConfigs(self):
-        with open('./params.ini', 'wt', encoding='utf-8') as f:
-            pprint(self.secondaryParams, stream=f)
+        pprint_to_file('params.ini', self.secondaryParams)
 
     @pyqtSlot(dict)
     def on_secondary_changed(self, params):
