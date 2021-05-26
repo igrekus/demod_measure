@@ -10,6 +10,8 @@ from textwrap import dedent
 
 import pandas as pd
 
+from util.file import load_ast_if_exists
+
 KHz = 1_000
 MHz = 1_000_000
 GHz = 1_000_000_000
@@ -30,10 +32,7 @@ class MeasureResult:
         self.data3 = defaultdict(list)
         self.data4 = defaultdict(list)
 
-        self.adjustment = None
-        if os.path.isfile('./adjust.ini'):
-            with open('./adjust.ini', 'rt', encoding='utf-8') as f:
-                self.adjustment = ast.literal_eval(''.join(f.readlines()))
+        self.adjustment = load_ast_if_exists('adjust.ini', default=None)
 
     def __bool__(self):
         return self.ready
