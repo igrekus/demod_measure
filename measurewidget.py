@@ -390,7 +390,8 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
             self._token.cancelled = True
 
     def on_params_changed(self, value):
-        self._uiDebouncer.start(5000)
+        if value != 1:
+            self._uiDebouncer.start(5000)
 
         params = {
             'Plo_min': self._spinPloMin.value(),
