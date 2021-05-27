@@ -110,7 +110,6 @@ class PrimaryPlotWidget(QWidget):
 
         self.setLayout(self._grid)
 
-    # TODO fix y data query
     def mouseMoved_00(self, event):
         pos = event[0]
         if self._plot_00.sceneBoundingRect().contains(pos):
