@@ -307,8 +307,6 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinTimeBaseCoeff.setValue(1)
         self._devices._layout.addRow('Tbase.coeff=', self._spinTimeBaseCoeff)
 
-        self._connectSignals()
-
     def _connectSignals(self):
         self._spinPloMin.valueChanged.connect(self.on_params_changed)
         self._spinPloMax.valueChanged.connect(self.on_params_changed)
@@ -435,6 +433,8 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinLoss.setValue(params['loss'])
         self._spinScaleOscY.setValue(params['scale_y'])
         self._spinTimeBaseCoeff.setValue(params['timebase_coeff'])
+
+        self._connectSignals()
 
     def on_debounced_gui(self):
         remove_if_exists('cal_lo.ini')
