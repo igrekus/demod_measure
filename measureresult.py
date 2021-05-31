@@ -42,6 +42,7 @@ class MeasureResult:
 
     def _process_point(self, data):
         f_lo = data['f_lo'] / GHz
+        f_rf = data['f_rf'] / GHz
         p_lo = data['p_lo']
         ui = data['ch1_amp']
         uq = data['ch2_amp']
@@ -68,7 +69,7 @@ class MeasureResult:
             'p_lo': data['p_lo'],
             'f_lo': f_lo,
             'p_rf': p_rf,
-            'f_rf': data['f_rf'] / GHz,
+            'f_rf': f_rf,
             'u_src': round(data['u_src'], 1),
             'i_src': round(data['i_src'] * mA, 2),
             'ui': round(data['ch1_amp'] * mV, 1),
@@ -86,10 +87,10 @@ class MeasureResult:
             'loss': data['loss'],
         }
 
-        self.data1[p_lo].append([f_lo, kp_loss])
-        self.data2[p_lo].append([f_lo, a_err_db])
-        self.data3[p_lo].append([f_lo, ph_err])
-        self.data4[p_lo].append([f_lo, a_zk])
+        self.data1[p_lo].append([f_rf, kp_loss])
+        self.data2[p_lo].append([f_rf, a_err_db])
+        self.data3[p_lo].append([f_rf, ph_err])
+        self.data4[p_lo].append([f_rf, a_zk])
         self._processed.append({**self._report})
 
     def clear(self):
