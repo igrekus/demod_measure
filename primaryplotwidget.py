@@ -49,7 +49,7 @@ class PrimaryPlotWidget(QWidget):
         self._curves_11 = dict()
 
         self._plot_00.setLabel('left', 'Кп', **self.label_style)
-        self._plot_00.setLabel('bottom', 'Fгет, ГГц', **self.label_style)
+        self._plot_00.setLabel('bottom', 'Fвх, ГГц', **self.label_style)
         # self._plot_00.setXRange(0, 11, padding=0)
         # self._plot_00.setYRange(20, 55, padding=0)
         self._plot_00.enableAutoRange('x')
@@ -64,7 +64,7 @@ class PrimaryPlotWidget(QWidget):
         self._proxy_00 = pg.SignalProxy(self._plot_00.scene().sigMouseMoved, rateLimit=60, slot=self.mouseMoved_00)
 
         self._plot_01.setLabel('left', 'αош, дБ', **self.label_style)
-        self._plot_01.setLabel('bottom', 'Fгет, ГГц', **self.label_style)
+        self._plot_01.setLabel('bottom', 'Fвх, ГГц', **self.label_style)
         # self._plot_01.setXRange(0, 11, padding=0)
         # self._plot_01.setYRange(20, 55, padding=0)
         self._plot_01.enableAutoRange('x')
@@ -79,7 +79,7 @@ class PrimaryPlotWidget(QWidget):
         self._proxy_01 = pg.SignalProxy(self._plot_01.scene().sigMouseMoved, rateLimit=60, slot=self.mouseMoved_01)
 
         self._plot_10.setLabel('left', 'φош, градусы', **self.label_style)
-        self._plot_10.setLabel('bottom', 'Fгет, ГГц', **self.label_style)
+        self._plot_10.setLabel('bottom', 'Fвх, ГГц', **self.label_style)
         # self._plot_10.setXRange(0, 11, padding=0)
         # self._plot_10.setYRange(20, 55, padding=0)
         self._plot_10.enableAutoRange('x')
@@ -94,7 +94,7 @@ class PrimaryPlotWidget(QWidget):
         self._proxy_10 = pg.SignalProxy(self._plot_10.scene().sigMouseMoved, rateLimit=60, slot=self.mouseMoved_10)
 
         self._plot_11.setLabel('left', 'αзк', **self.label_style)
-        self._plot_11.setLabel('bottom', 'Fгет, ГГц', **self.label_style)
+        self._plot_11.setLabel('bottom', 'Fвх, ГГц', **self.label_style)
         # self._plot_11.setXRange(0, 11, padding=0)
         # self._plot_11.setYRange(20, 55, padding=0)
         self._plot_11.enableAutoRange('x')
@@ -191,13 +191,13 @@ class PrimaryPlotWidget(QWidget):
 
     def plot(self):
         print('plotting primary stats')
-        _plot_curves(self._controller.result.data1, self._curves_00, self._plot_00)
-        _plot_curves(self._controller.result.data2, self._curves_01, self._plot_01)
-        _plot_curves(self._controller.result.data3, self._curves_10, self._plot_10)
-        _plot_curves(self._controller.result.data4, self._curves_11, self._plot_11)
+        _plot_curves(self._controller.result.data1, self._curves_00, self._plot_00, prefix='Pгет= ', suffix=' дБм')
+        _plot_curves(self._controller.result.data2, self._curves_01, self._plot_01, prefix='Pгет= ', suffix=' дБм')
+        _plot_curves(self._controller.result.data3, self._curves_10, self._plot_10, prefix='Pгет= ', suffix=' дБм')
+        _plot_curves(self._controller.result.data4, self._curves_11, self._plot_11, prefix='Pгет= ', suffix=' дБм')
 
 
-def _plot_curves(datas, curves, plot):
+def _plot_curves(datas, curves, plot, prefix='', suffix=''):
     for pow_lo, data in datas.items():
         curve_xs, curve_ys = zip(*data)
         try:
@@ -217,7 +217,7 @@ def _plot_curves(datas, curves, plot):
                 symbol='o',
                 symbolSize=5,
                 symbolBrush=color,
-                name=f'{pow_lo} дБм'
+                name=f'{prefix}{pow_lo}{suffix}'
             )
             plot.addItem(curves[pow_lo])
 
