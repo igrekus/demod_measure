@@ -298,7 +298,7 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinScaleOscY.setSingleStep(0.1)
         self._spinScaleOscY.setValue(0.7)
         self._spinScaleOscY.setSuffix(' мВ')
-        self._devices._layout.addRow('Scale y=', self._spinScaleOscY)
+        self._devices._layout.addRow('Range y=', self._spinScaleOscY)
 
         self._spinTimeBaseCoeff = QDoubleSpinBox(parent=self)
         self._spinTimeBaseCoeff.setMinimum(-100)
