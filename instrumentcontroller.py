@@ -461,6 +461,7 @@ class InstrumentController(QObject):
 
                             big_amp, ch_num = (osc_ch1_amp, 1) if osc_ch1_amp > osc_ch2_amp else (osc_ch2_amp, 2)
                             current_scale = float(osc.query(f':CHAN{ch_num}:SCALE?'))
+                    # TODO fix this branch for small signal behaviour
                     else:
                         # if reading was not correct, reset OSC display range to safe level (controlled via GUI)
                         # and iterate OSC range scaling a few times
