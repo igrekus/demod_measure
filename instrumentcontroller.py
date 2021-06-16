@@ -528,9 +528,14 @@ class InstrumentController(QObject):
                 # read actual amp values after auto-scale (if any occured)
                 osc.send(':CDIS')
 
-                time.sleep(2)
+                if not mock_enabled:
+                    time.sleep(2)
 
-                stats_split = osc.query(':MEASure:RESults?').split(',')
+                if mock_enabled:
+                    _, stats = mocked_raw_data[index]
+                else:
+                    stats = osc.query(':MEASure:RESults?')
+                stats_split = stats.split(',')
                 osc_ch1_amp = float(stats_split[18])
                 osc_ch2_amp = float(stats_split[25])
 
