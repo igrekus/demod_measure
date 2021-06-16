@@ -55,8 +55,8 @@ class MeasureResult:
         a_err_times = uq / ui
         a_err_db = 20 * (log10(uq) - log10(ui))
         ph_err = phase + 90
-        a_zk = 10 * log10((1 + a_err_times ** 2 - 2 * a_err_times * cos(radians(ph_err))) /
-                          (1 + a_err_times ** 2 + 2 * a_err_times * cos(radians(ph_err))))
+        a_zk = 10 * log10((1 + a_err_times ** 2 + 2 * a_err_times * cos(radians(ph_err))) /
+                          (1 + a_err_times ** 2 - 2 * a_err_times * cos(radians(ph_err))))
 
         if self.adjustment is not None:
             point = self.adjustment[len(self._processed)]
