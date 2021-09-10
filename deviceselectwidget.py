@@ -15,7 +15,7 @@ class DeviceSelectWidget(QWidget):
         for i, label in enumerate(params.keys()):
             self._combo.addItem(label)
 
-        self._layout.addRow('Прибор', self._combo)
+        self._layout.addRow('Отчёт для t°', self._combo)
 
         self.setLayout(self._layout)
 
