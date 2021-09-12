@@ -27,6 +27,7 @@ class MainWindow(QMainWindow):
 
         self.setAttribute(Qt.WA_QuitOnClose)
         self.setAttribute(Qt.WA_DeleteOnClose)
+        self.setWindowTitle('Измерение параметров КД')
 
         # create instance variables
         self._ui = uic.loadUi('mainwindow.ui', self)
