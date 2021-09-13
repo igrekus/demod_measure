@@ -57,7 +57,7 @@ class InstrumentController(QObject):
             'Usrc': 5.0,
             'OscAvg': True,
             'loss': 0.82,
-            'scale_y': 0.7,
+            'scale_y': 0.2,
             'timebase_coeff': 1.0,
         })
 
@@ -312,8 +312,8 @@ class InstrumentController(QObject):
         osc.send(f':CHANnel1:DISPlay ON')
         osc.send(f':CHANnel2:DISPlay ON')
 
-        osc.send(':CHAN1:SCALE 0.05')  # V
-        osc.send(':CHAN2:SCALE 0.05')
+        osc.send(f':CHAN1:SCALE {osc_scale}')  # V
+        osc.send(f':CHAN2:SCALE {osc_scale}')
         osc.send(':TIMEBASE:SCALE 10E-8')  # ms / div
 
         osc.send(':TRIGger:MODE EDGE')
@@ -341,6 +341,7 @@ class InstrumentController(QObject):
 
         low_signal_threshold = 1.1
         range_ratio = 1.2
+        upscale_ratio = 1.3
 
         if mock_enabled:
             # with open('./mock_data/meas_1_-10-5db.txt', mode='rt', encoding='utf-8') as f:
@@ -399,7 +400,8 @@ class InstrumentController(QObject):
                 osc_phase = float(stats_split[11])
                 osc_ch1_freq = float(stats_split[4])
 
-                timebase = (1 / (abs(freq_rf - ((freq_lo / 2) if freq_lo_x2 else freq_lo)) * 10_000_000)) * 0.01 * osc_timebase_coeff
+                timebase = (1 / (abs(freq_rf - (
+                    (freq_lo / 2) if freq_lo_x2 else freq_lo)) * 10_000_000)) * 0.01 * osc_timebase_coeff
                 osc.send(f':TIMEBASE:SCALE {timebase}')  # ms / div
                 osc.send(f':CHANnel1:OFFSet 0')
                 osc.send(f':CHANnel2:OFFSet 0')
@@ -455,9 +457,10 @@ class InstrumentController(QObject):
                         # to get the correct reading
                         max_amp = osc_ch1_amp if osc_ch1_amp > osc_ch2_amp else osc_ch2_amp
                         if max_amp > 1_000_000:
+                            new_scale = osc_scale * upscale_ratio
 
-                            osc.send(f':CHANnel1:RANGe {osc_scale}')
-                            osc.send(f':CHANnel2:RANGe {osc_scale}')
+                            osc.send(f':CHANnel1:scale {new_scale}')
+                            osc.send(f':CHANnel2:scale {new_scale}')
 
                             osc.send(':CDIS')
 
@@ -469,10 +472,8 @@ class InstrumentController(QObject):
 
                             # check if safe level results in too small signal
                             big_amp, ch_num = (osc_ch1_amp, 1) if osc_ch1_amp > osc_ch2_amp else (osc_ch2_amp, 2)
-                            current_scale = float(osc.query(f':CHAN{ch_num}:SCALE?'))
 
-                            # if signal fits in less than 1.5 sections of the display, auto scale OSC display up
-                            while big_amp / current_scale <= low_signal_threshold:
+                            while big_amp > 1_000_000:
 
                                 if token.cancelled:
                                     gen_lo.send(f'OUTP:STAT OFF')
@@ -487,10 +488,10 @@ class InstrumentController(QObject):
                                     gen_lo.send(f'SOUR:FREQ {freq_rf_start}GHz')
                                     raise RuntimeError('measurement cancelled')
 
-                                target_range = big_amp + big_amp * range_ratio
+                                new_scale *= upscale_ratio
 
-                                osc.send(f':CHANnel1:RANGe {target_range}')
-                                osc.send(f':CHANnel2:RANGe {target_range}')
+                                osc.send(f':CHANnel1:scale {new_scale}')
+                                osc.send(f':CHANnel2:scale {new_scale}')
 
                                 osc.send(':CDIS')
 
@@ -502,15 +503,12 @@ class InstrumentController(QObject):
                                 osc_ch2_amp = float(autofit_stats_split[25])
 
                                 big_amp, ch_num = (osc_ch1_amp, 1) if osc_ch1_amp > osc_ch2_amp else (osc_ch2_amp, 2)
-                                current_scale = float(osc.query(f':CHAN{ch_num}:SCALE?'))
                             else:
                                 # if safe level is acceptable, select largest signal
                                 # and fit the display to 130% of the signal
-                                max_amp = osc_ch1_amp if osc_ch1_amp > osc_ch2_amp else osc_ch2_amp
-                                target_range = max_amp * range_ratio
-                                if target_range < 1_000_000:
-                                    osc.send(f':CHANnel1:RANGe {target_range}')
-                                    osc.send(f':CHANnel2:RANGe {target_range}')
+                                target_range = big_amp * range_ratio
+                                osc.send(f':CHANnel1:RANGe {target_range}')
+                                osc.send(f':CHANnel2:RANGe {target_range}')
 
                 # read actual amp values after auto-scale (if any occured)
                 osc.send(':CDIS')
