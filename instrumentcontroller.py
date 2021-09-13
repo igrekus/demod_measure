@@ -336,6 +336,7 @@ class InstrumentController(QObject):
 
         # pow_lo_end = -5.0
         # pow_lo_step = 5
+        gen_f_mul = 2 if d else 1
 
         pow_lo_values = [round(x, 3) for x in np.arange(start=pow_lo_start, stop=pow_lo_end + 0.0001, step=pow_lo_step)] \
             if pow_lo_start != pow_lo_end else [pow_lo_start]
@@ -346,6 +347,8 @@ class InstrumentController(QObject):
 
         gen_lo.send(f':OUTP:MOD:STAT OFF')
         # gen_rf.send(f':OUTP:MOD:STAT OFF')
+        gen_lo.send(f':FREQ:MULT {gen_f_mul}')
+        gen_rf.send(f':FREQ:MULT {gen_f_mul}')
 
         low_signal_threshold = 1.1
         range_ratio = 1.2
@@ -542,7 +545,7 @@ class InstrumentController(QObject):
                     'f_lo': f_lo_read,
                     'p_rf': pow_rf,
                     'f_rf': f_rf_read,
-                    'u_src': src_u,   # power source voltage
+                    'u_src': src_u,  # power source voltage
                     'i_src': i_src_read,
                     'ch1_amp': osc_ch1_amp,
                     'ch2_amp': osc_ch2_amp,
@@ -558,6 +561,8 @@ class InstrumentController(QObject):
 
                 print(raw_point, stats)
                 self._add_measure_point(raw_point)
+
+                # time.sleep(120)
 
                 res.append([raw_point, stats])
 
