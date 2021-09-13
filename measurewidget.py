@@ -328,6 +328,7 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinUsrc.valueChanged.connect(self.on_params_changed)
 
         self._checkOscAvg.toggled.connect(self.on_params_changed)
+        self._checkD.toggled.connect(self.on_params_changed)
 
         self._spinLoss.valueChanged.connect(self.on_params_changed)
 
