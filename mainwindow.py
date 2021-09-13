@@ -27,10 +27,11 @@ class MainWindow(QMainWindow):
 
         self.setAttribute(Qt.WA_QuitOnClose)
         self.setAttribute(Qt.WA_DeleteOnClose)
-        self.setWindowTitle('Измерение параметров КД')
 
         # create instance variables
         self._ui = uic.loadUi('mainwindow.ui', self)
+        self.setWindowTitle('Измерение параметров КД')
+
         self._instrumentController = InstrumentController(parent=self)
         self._connectionWidget = ConnectionWidget(parent=self, controller=self._instrumentController)
         self._measureWidget = MeasureWidgetWithSecondaryParameters(parent=self, controller=self._instrumentController)
