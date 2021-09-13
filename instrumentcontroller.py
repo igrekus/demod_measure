@@ -37,8 +37,14 @@ class InstrumentController(QObject):
         }
 
         self.deviceParams = {
-            'Демодулятор': {
-                'F': 1,
+            '+25': {
+                'filename': 'adjust_+25.ini',
+            },
+            '-60': {
+                'filename': 'adjust_-60.ini',
+            },
+            '+85': {
+                'filename': 'adjust_+85.ini',
             },
         }
 
@@ -56,6 +62,7 @@ class InstrumentController(QObject):
             'Frf_delta': 0.1,
             'Usrc': 5.0,
             'OscAvg': True,
+            'D': False,
             'loss': 0.82,
             'scale_y': 0.2,
             'timebase_coeff': 1.0,
@@ -301,6 +308,7 @@ class InstrumentController(QObject):
         loss = secondary['loss']
 
         osc_avg = 'ON' if secondary['OscAvg'] else 'OFF'
+        d = secondary['D']
 
         osc_scale = secondary['scale_y']
         osc_timebase_coeff = secondary['timebase_coeff']

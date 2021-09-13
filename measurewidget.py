@@ -284,6 +284,10 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._checkOscAvg.setChecked(True)
         self._devices._layout.addRow('Avg on/off', self._checkOscAvg)
 
+        self._checkD = QCheckBox(parent=self)
+        self._checkD.setChecked(False)
+        self._devices._layout.addRow('D', self._checkD)
+
         self._spinLoss = QDoubleSpinBox(parent=self)
         self._spinLoss.setMinimum(0)
         self._spinLoss.setMaximum(20)
@@ -296,9 +300,9 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinScaleOscY.setMinimum(0)
         self._spinScaleOscY.setMaximum(2)
         self._spinScaleOscY.setSingleStep(0.1)
-        self._spinScaleOscY.setValue(0.7)
-        self._spinScaleOscY.setSuffix(' мВ')
-        self._devices._layout.addRow('Range y=', self._spinScaleOscY)
+        self._spinScaleOscY.setValue(0.2)
+        self._spinScaleOscY.setSuffix(' В')
+        self._devices._layout.addRow('Scale y=', self._spinScaleOscY)
 
         self._spinTimeBaseCoeff = QDoubleSpinBox(parent=self)
         self._spinTimeBaseCoeff.setMinimum(-100)
@@ -408,6 +412,7 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
             'Usrc': self._spinUsrc.value(),
 
             'OscAvg': self._checkOscAvg.isChecked(),
+            'D': self._checkD.isChecked(),
 
             'loss': self._spinLoss.value(),
 
@@ -430,6 +435,7 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinFrfDelta.setValue(params['Frf_delta'])
         self._spinUsrc.setValue(params['Usrc'])
         self._checkOscAvg.setChecked(params['OscAvg'])
+        self._checkD.setChecked(params['D'])
         self._spinLoss.setValue(params['loss'])
         self._spinScaleOscY.setValue(params['scale_y'])
         self._spinTimeBaseCoeff.setValue(params['timebase_coeff'])
