@@ -57,11 +57,14 @@ class MeasureResult:
                           (1 + a_err_times ** 2 - 2 * a_err_times * cos(radians(ph_err))))
 
         if self.adjustment is not None:
-            point = self.adjustment[len(self._processed)]
-            kp_loss += point['kp_loss']
-            a_err_db += point['a_err_db']
-            ph_err += point['ph_err']
-            a_zk += point['a_zk']
+            try:
+                point = self.adjustment[len(self._processed)]
+                kp_loss += point['kp_loss']
+                a_err_db += point['a_err_db']
+                ph_err += point['ph_err']
+                a_zk += point['a_zk']
+            except IndexError:
+                pass
 
         self._report = {
             'p_lo': data['p_lo'],
