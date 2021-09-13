@@ -6,6 +6,7 @@ from math import log10, cos, radians
 from subprocess import Popen
 from textwrap import dedent
 
+import openpyxl
 import pandas as pd
 
 from forgot_again.file import load_ast_if_exists, pprint_to_file
@@ -19,6 +20,7 @@ mV = 1_000
 
 class MeasureResult:
     def __init__(self):
+        self._primary_params = None
         self._secondaryParams = None
         self._raw = list()
         self._report = dict()
@@ -110,6 +112,9 @@ class MeasureResult:
     def set_secondary_params(self, params):
         self._secondaryParams = dict(**params)
 
+    def set_primary_params(self, params):
+        self._primary_params = dict(**params)
+
     def add_point(self, data):
         self._raw.append(data)
         self._process_point(data)
@@ -182,3 +187,36 @@ class MeasureResult:
 
         full_path = os.path.abspath(file_name)
         Popen(f'explorer /select,"{full_path}"')
+
+    def _list_get_xlsx(self):
+        return [f for f in os.listdir('.') if os.path.isfile(f) and f.endswith('.xlsx')]
+
+    def _parse_xlsx(self, file):
+        wb = openpyxl.load_workbook(file)
+        ws = wb.active
+
+        rows = list(ws.rows)
+        self.headers = [row.value for row in rows[0][2:]]
+
+        for i in range(1, len(rows), 3):
+            index = rows[i][0].value
+            for j in range(2, ws.max_column):
+                self._gens[index][rows[0][j].value] = [rows[i][j].value, rows[i + 1][j].value, rows[i + 2][j].value]
+
+        self.headers = [self.headers[i] for i in to_gen]
+        self._raw_data = [self.gen_value(col) for i, col in enumerate(self._gens[index].values()) if i in to_gen]
+
+    def gen_value(self, data):
+        if not data:
+            return '-'
+        if '-' in data:
+            return '-'
+        span, step, mean = data
+        start = mean - span
+        stop = mean + span
+        if span == 0 or step == 0:
+            return mean
+        return round(random.randint(0, int((stop - start) / step)) * step + start, 2)
+
+    def get_result_table_data(self):
+        return ['h1', 'h2', 'h3'], ['v1', 'v2', 'v3']

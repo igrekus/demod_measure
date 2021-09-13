@@ -5,7 +5,7 @@ from measuremodel import MeasureModel
 
 class ResultTableWidget(QWidget):
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, controller=None):
         super().__init__(parent=parent)
 
         self._model = MeasureModel(parent=self)
@@ -17,5 +17,7 @@ class ResultTableWidget(QWidget):
 
         self.setLayout(self._layout)
 
+        self._result = controller.result
+
     def updateResult(self):
-        self._model.update()
+        self._model.update(*self._result.get_result_table_data())

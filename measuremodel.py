@@ -5,25 +5,20 @@ class MeasureModel(QAbstractTableModel):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self._headers = list()
+        self._header = list()
         self._data = list()
 
-        self._init()
-
-    def _init(self):
-        self._headers = ['1', '2', '3']
-
-    def update(self):
+    def update(self, header, data):
         self.beginResetModel()
-        self._init()
-        self._data = ['a', 'b', 'c']
+        self._header = header
+        self._data = data
         self.endResetModel()
 
     def headerData(self, section, orientation, role=None):
         if orientation == Qt.Horizontal:
             if role == Qt.DisplayRole:
-                if section < len(self._headers):
-                    return QVariant(self._headers[section])
+                if section < len(self._header):
+                    return QVariant(self._header[section])
         return QVariant()
 
     def rowCount(self, parent=None, *args, **kwargs):
@@ -32,7 +27,7 @@ class MeasureModel(QAbstractTableModel):
         return 1
 
     def columnCount(self, parent=None, *args, **kwargs):
-        return len(self._headers)
+        return len(self._header)
 
     def data(self, index, role=None):
         if not index.isValid():

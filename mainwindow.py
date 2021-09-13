@@ -37,7 +37,7 @@ class MainWindow(QMainWindow):
         self._connectionWidget = ConnectionWidget(parent=self, controller=self._instrumentController)
         self._measureWidget = MeasureWidgetWithSecondaryParameters(parent=self, controller=self._instrumentController)
         self._plotWidget = PrimaryPlotWidget(parent=self, controller=self._instrumentController)
-        self._tableResultWidget = ResultTableWidget(parent=self)
+        self._tableResultWidget = ResultTableWidget(parent=self, controller=self._instrumentController)
 
         # init UI
         self._ui.layInstrs.insertWidget(0, self._connectionWidget)

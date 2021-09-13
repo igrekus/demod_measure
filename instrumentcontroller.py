@@ -38,13 +38,16 @@ class InstrumentController(QObject):
 
         self.deviceParams = {
             '+25': {
-                'filename': 'adjust_+25.ini',
+                'adjust': 'adjust_+25.ini',
+                'result': 'result_+25.xlsx',
             },
             '-60': {
-                'filename': 'adjust_-60.ini',
+                'adjust': 'adjust_-60.ini',
+                'result': 'result_-60.xlsx',
             },
             '+85': {
-                'filename': 'adjust_+85.ini',
+                'adjust': 'adjust_+85.ini',
+                'result': 'result_+85.xlsx',
             },
         }
 
@@ -256,6 +259,7 @@ class InstrumentController(QObject):
         device, _ = params
         try:
             self.result.set_secondary_params(self.secondaryParams)
+            self.result.set_primary_params(self.deviceParams[device])
             self._measure(token, device)
             # self.hasResult = bool(self.result)
             self.hasResult = True  # HACK
