@@ -65,7 +65,7 @@ class MeasureResult:
                 a_err_db += point['a_err_db']
                 ph_err += point['ph_err']
                 a_zk += point['a_zk']
-            except IndexError:
+            except LookupError:
                 pass
 
         self._report = {
@@ -107,6 +107,8 @@ class MeasureResult:
         self.data3.clear()
         self.data4.clear()
 
+        self.adjustment = load_ast_if_exists(self._primary_params.get('adjust', ''), default={})
+
         self.ready = False
 
     def set_secondary_params(self, params):
@@ -120,7 +122,7 @@ class MeasureResult:
         self._process_point(data)
 
     def save_adjustment_template(self):
-        if self.adjustment is None:
+        if not self.adjustment:
             print('measured, saving template')
             self.adjustment = [{
                 'p_lo': p['p_lo'],
@@ -131,7 +133,6 @@ class MeasureResult:
                 'a_err_db': 0,
                 'ph_err': 0,
                 'a_zk': 0,
-
             } for p in self._processed]
         pprint_to_file('adjust.ini', self.adjustment)
 
