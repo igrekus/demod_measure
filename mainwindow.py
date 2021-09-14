@@ -90,6 +90,7 @@ class MainWindow(QMainWindow):
         print('meas complete')
         self._plotWidget.plot()
         self._instrumentController.result.save_adjustment_template()
+        self._instrumentController.result.process()
         self._tableResultWidget.updateResult()
 
     @pyqtSlot()

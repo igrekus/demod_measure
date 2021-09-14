@@ -1,5 +1,6 @@
 import os
 import datetime
+import random
 
 from collections import defaultdict
 from math import log10, cos, radians
@@ -33,12 +34,15 @@ class MeasureResult:
         self.data4 = defaultdict(list)
 
         self.adjustment = load_ast_if_exists('adjust.ini', default=None)
+        self._table_header = list()
+        self._table_data = list()
 
     def __bool__(self):
         return self.ready
 
-    def _process(self):
+    def process(self):
         self.ready = True
+        self._prepare_table_data()
 
     def _process_point(self, data):
         f_lo = data['f_lo'] / GHz
@@ -189,25 +193,26 @@ class MeasureResult:
         full_path = os.path.abspath(file_name)
         Popen(f'explorer /select,"{full_path}"')
 
-    def _list_get_xlsx(self):
-        return [f for f in os.listdir('.') if os.path.isfile(f) and f.endswith('.xlsx')]
+    def _prepare_table_data(self):
+        table_file = self._primary_params.get('result', '')
 
-    def _parse_xlsx(self, file):
-        wb = openpyxl.load_workbook(file)
+        if not os.path.isfile(table_file):
+            return
+
+        wb = openpyxl.load_workbook(table_file)
         ws = wb.active
 
         rows = list(ws.rows)
-        self.headers = [row.value for row in rows[0][2:]]
+        self._table_header = [row.value for row in rows[0][1:]]
 
-        for i in range(1, len(rows), 3):
-            index = rows[i][0].value
-            for j in range(2, ws.max_column):
-                self._gens[index][rows[0][j].value] = [rows[i][j].value, rows[i + 1][j].value, rows[i + 2][j].value]
+        gens = [
+            [rows[1][j].value, rows[2][j].value, rows[3][j].value]
+            for j in range(1, ws.max_column)
+        ]
 
-        self.headers = [self.headers[i] for i in to_gen]
-        self._raw_data = [self.gen_value(col) for i, col in enumerate(self._gens[index].values()) if i in to_gen]
+        self._table_data = [self._gen_value(col) for col in gens]
 
-    def gen_value(self, data):
+    def _gen_value(self, data):
         if not data:
             return '-'
         if '-' in data:
@@ -220,4 +225,4 @@ class MeasureResult:
         return round(random.randint(0, int((stop - start) / step)) * step + start, 2)
 
     def get_result_table_data(self):
-        return ['h1', 'h2', 'h3'], ['v1', 'v2', 'v3']
+        return list(self._table_header), list(self._table_data)
