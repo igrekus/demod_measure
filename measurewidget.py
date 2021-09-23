@@ -272,13 +272,22 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinFrfDelta.setSuffix(' ГГц')
         self._devices._layout.addRow('ΔFвх.=', self._spinFrfDelta)
 
-        self._spinUsrc = QDoubleSpinBox(parent=self)
-        self._spinUsrc.setMinimum(4.75)
-        self._spinUsrc.setMaximum(5.25)
-        self._spinUsrc.setSingleStep(0.25)
-        self._spinUsrc.setValue(5)
-        self._spinUsrc.setSuffix(' В')
-        self._devices._layout.addRow('Uпит.=', self._spinUsrc)
+        self._spinUsrcA = QDoubleSpinBox(parent=self)
+        self._spinUsrcA.setMinimum(4.75)
+        self._spinUsrcA.setMaximum(5.25)
+        self._spinUsrcA.setSingleStep(0.25)
+        self._spinUsrcA.setValue(5)
+        self._spinUsrcA.setSuffix(' В')
+        self._devices._layout.addRow('Uпит.A=', self._spinUsrcA)
+
+
+        self._spinUsrcD = QDoubleSpinBox(parent=self)
+        self._spinUsrcD.setMinimum(3.1)
+        self._spinUsrcD.setMaximum(3.5)
+        self._spinUsrcD.setSingleStep(0.1)
+        self._spinUsrcD.setValue(3.3)
+        self._spinUsrcD.setSuffix(' В')
+        self._devices._layout.addRow('Uпит.D=', self._spinUsrcD)
 
         self._checkOscAvg = QCheckBox(parent=self)
         self._checkOscAvg.setChecked(True)
@@ -325,7 +334,8 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinFrfMax.valueChanged.connect(self.on_params_changed)
         self._spinFrfDelta.valueChanged.connect(self.on_params_changed)
 
-        self._spinUsrc.valueChanged.connect(self.on_params_changed)
+        self._spinUsrcA.valueChanged.connect(self.on_params_changed)
+        self._spinUsrcD.valueChanged.connect(self.on_params_changed)
 
         self._checkOscAvg.toggled.connect(self.on_params_changed)
         self._checkD.toggled.connect(self.on_params_changed)
@@ -393,8 +403,8 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
             self._token.cancelled = True
 
     def on_params_changed(self, value):
-        if value != 1:
-            self._uiDebouncer.start(5000)
+        # if value != 1:
+        #     self._uiDebouncer.start(5000)
 
         params = {
             'Plo_min': self._spinPloMin.value(),
@@ -410,7 +420,8 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
             'Frf_max': self._spinFrfMax.value(),
             'Frf_delta': self._spinFrfDelta.value(),
 
-            'Usrc': self._spinUsrc.value(),
+            'Usrc': self._spinUsrcA.value(),
+            'UsrcD': self._spinUsrcD.value(),
 
             'OscAvg': self._checkOscAvg.isChecked(),
             'D': self._checkD.isChecked(),
@@ -434,7 +445,8 @@ class MeasureWidgetWithSecondaryParameters(MeasureWidget):
         self._spinFrfMin.setValue(params['Frf_min'])
         self._spinFrfMax.setValue(params['Frf_max'])
         self._spinFrfDelta.setValue(params['Frf_delta'])
-        self._spinUsrc.setValue(params['Usrc'])
+        self._spinUsrcA.setValue(params['Usrc'])
+        self._spinUsrcD.setValue(params['UsrcD'])
         self._checkOscAvg.setChecked(params['OscAvg'])
         self._checkD.setChecked(params['D'])
         self._spinLoss.setValue(params['loss'])

@@ -64,6 +64,7 @@ class InstrumentController(QObject):
             'Frf_max': 3.1,
             'Frf_delta': 0.1,
             'Usrc': 5.0,
+            'UsrcD': 3.3,
             'OscAvg': True,
             'D': False,
             'loss': 0.82,
@@ -296,6 +297,8 @@ class InstrumentController(QObject):
 
         src_u = secondary['Usrc']
         src_i = 200  # mA
+        src_u_d = secondary['UsrcD']
+        src_i_d = 20  # mA
         pow_lo_start = secondary['Plo_min']
         pow_lo_end = secondary['Plo_max']
         pow_lo_step = secondary['Plo_delta']
@@ -318,6 +321,7 @@ class InstrumentController(QObject):
         osc_timebase_coeff = secondary['timebase_coeff']
 
         src.send(f'APPLY p6v,{src_u}V,{src_i}mA')
+        src.send(f'APPLY p25v,{src_u_d}V,{src_i_d}mA')
 
         osc.send(f':ACQ:AVERage {osc_avg}')
 
