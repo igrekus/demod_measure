@@ -77,8 +77,6 @@ class MeasureResult:
             'f_lo': f_lo,
             'p_rf': p_rf,
             'f_rf': f_rf,
-            'u_src': round(data['u_src'], 1),
-            'i_src': round(data['i_src'] * mA, 2),
             'ui': round(data['ch1_amp'] * mV, 1),
             'uq': round(data['ch2_amp'] * mV, 1),
             'phase': phase,
@@ -148,10 +146,6 @@ class MeasureResult:
         Pвх, дБм={p_rf}
         Fвх, ГГц={f_rf:0.2f}
         Fпч, МГц={f_tune:0.2f}
-        
-        Источник питания:
-        U, В={u_src}
-        I, мА={i_src}
 
         Осциллограф:
         F, ГГц={freq:0.3f}
@@ -179,7 +173,6 @@ class MeasureResult:
         df.columns = [
             'Pгет, дБм', 'Fгет, ГГц',
             'Pвх, дБм', 'Fвх, ГГц',
-            'Uпит, В', 'Iпит, мА',
             'UI, мВ', 'UQ, мВ',
             'Δφ, º', 'Fосц, ГГц',
             'Fпч, МГц', 'αош, мВ',

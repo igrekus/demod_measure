@@ -23,8 +23,6 @@ class InstrumentController(QObject):
             'Анализатор': 'GPIB1::18::INSTR',
             'P LO': 'GPIB1::6::INSTR',
             'P RF': 'GPIB1::20::INSTR',
-            'Источник': 'GPIB1::3::INSTR',
-            'Мультиметр': 'GPIB1::22::INSTR',
         })
 
         self.requiredInstruments = {
@@ -32,8 +30,6 @@ class InstrumentController(QObject):
             'Анализатор': AnalyzerFactory(addrs['Анализатор']),
             'P LO': GeneratorFactory(addrs['P LO']),
             'P RF': GeneratorFactory(addrs['P RF']),
-            'Источник': SourceFactory(addrs['Источник']),
-            'Мультиметр': MultimeterFactory(addrs['Мультиметр']),
         }
 
         self.deviceParams = {
@@ -63,8 +59,6 @@ class InstrumentController(QObject):
             'Frf_min': 0.11,
             'Frf_max': 3.1,
             'Frf_delta': 0.1,
-            'Usrc': 5.0,
-            'UsrcD': 3.3,
             'OscAvg': True,
             'D': False,
             'loss': 0.82,
@@ -283,22 +277,14 @@ class InstrumentController(QObject):
         self._instruments['P LO'].send('*RST')
         self._instruments['P RF'].send('*RST')
         self._instruments['Осциллограф'].send('*RST')
-        self._instruments['Источник'].send('*RST')
-        self._instruments['Мультиметр'].send('*RST')
         # self._instruments['Анализатор'].send('*RST')
 
     def _measure_s_params(self, token, param, secondary):
         gen_lo = self._instruments['P LO']
         gen_rf = self._instruments['P RF']
         osc = self._instruments['Осциллограф']
-        src = self._instruments['Источник']
-        mult = self._instruments['Мультиметр']
         # sa = self._instruments['Анализатор']
 
-        src_u = secondary['Usrc']
-        src_i = 200  # mA
-        src_u_d = secondary['UsrcD']
-        src_i_d = 20  # mA
         pow_lo_start = secondary['Plo_min']
         pow_lo_end = secondary['Plo_max']
         pow_lo_step = secondary['Plo_delta']
@@ -319,9 +305,6 @@ class InstrumentController(QObject):
 
         osc_scale = secondary['scale_y']
         osc_timebase_coeff = secondary['timebase_coeff']
-
-        src.send(f'APPLY p6v,{src_u}V,{src_i}mA')
-        src.send(f'APPLY p25v,{src_u_d}V,{src_i_d}mA')
 
         osc.send(f':ACQ:AVERage {osc_avg}')
 
@@ -380,7 +363,6 @@ class InstrumentController(QObject):
                     gen_lo.send(f'OUTP:STAT OFF')
                     gen_rf.send(f'OUTP:STAT OFF')
                     time.sleep(0.5)
-                    src.send('OUTPut OFF')
 
                     gen_rf.send(f'SOUR:POW {pow_rf}dbm')
                     gen_lo.send(f'SOUR:POW {pow_lo_start}dbm')
@@ -394,9 +376,6 @@ class InstrumentController(QObject):
 
                 gen_lo.send(f'SOUR:FREQ {freq_lo}GHz')
                 gen_rf.send(f'SOUR:FREQ {freq_rf}GHz')
-
-                # TODO hoist out of the loops
-                src.send('OUTPut ON')
 
                 gen_lo.send(f'OUTP:STAT ON')
                 gen_rf.send(f'OUTP:STAT ON')
@@ -444,7 +423,6 @@ class InstrumentController(QObject):
                                 gen_lo.send(f'OUTP:STAT OFF')
                                 gen_rf.send(f'OUTP:STAT OFF')
                                 time.sleep(0.5)
-                                src.send('OUTPut OFF')
 
                                 gen_rf.send(f'SOUR:POW {pow_rf}dbm')
                                 gen_lo.send(f'SOUR:POW {pow_lo_start}dbm')
@@ -498,7 +476,6 @@ class InstrumentController(QObject):
                                     gen_lo.send(f'OUTP:STAT OFF')
                                     gen_rf.send(f'OUTP:STAT OFF')
                                     time.sleep(0.5)
-                                    src.send('OUTPut OFF')
 
                                     gen_rf.send(f'SOUR:POW {pow_rf}dbm')
                                     gen_lo.send(f'SOUR:POW {pow_lo_start}dbm')
@@ -546,15 +523,11 @@ class InstrumentController(QObject):
                 f_lo_read = float(gen_lo.query('SOUR:FREQ?'))
                 f_rf_read = float(gen_rf.query('SOUR:FREQ?'))
 
-                i_src_read = float(mult.query('MEAS:CURR:DC? 1A,DEF'))
-
                 raw_point = {
                     'p_lo': pow_lo,
                     'f_lo': f_lo_read,
                     'p_rf': pow_rf,
                     'f_rf': f_rf_read,
-                    'u_src': src_u,  # power source voltage
-                    'i_src': i_src_read,
                     'ch1_amp': osc_ch1_amp,
                     'ch2_amp': osc_ch2_amp,
                     'phase': osc_phase,
@@ -577,7 +550,6 @@ class InstrumentController(QObject):
         gen_lo.send(f'OUTP:STAT OFF')
         gen_rf.send(f'OUTP:STAT OFF')
         time.sleep(0.5)
-        src.send('OUTPut OFF')
 
         gen_rf.send(f'SOUR:POW {pow_rf}dbm')
         gen_lo.send(f'SOUR:POW {pow_lo_start}dbm')
