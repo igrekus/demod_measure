@@ -64,6 +64,7 @@ class InstrumentController(QObject):
             'Frf_max': 3.1,
             'Frf_delta': 0.1,
             'Usrc': 5.0,
+            'Ia_lim': 200,
             'UsrcD': 3.3,
             'OscAvg': True,
             'D': False,
@@ -296,7 +297,8 @@ class InstrumentController(QObject):
         # sa = self._instruments['Анализатор']
 
         src_u = secondary['Usrc']
-        src_i = 200  # mA
+        #src_i = 200  # mA
+        src_i = secondary['Ia_lim']
         src_u_d = secondary['UsrcD']
         src_i_d = 100  # mA
         pow_lo_start = secondary['Plo_min']
