@@ -298,7 +298,7 @@ class InstrumentController(QObject):
         src_u = secondary['Usrc']
         src_i = 200  # mA
         src_u_d = secondary['UsrcD']
-        src_i_d = 20  # mA
+        src_i_d = 100  # mA
         pow_lo_start = secondary['Plo_min']
         pow_lo_end = secondary['Plo_max']
         pow_lo_step = secondary['Plo_delta']
